@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\HomePageController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,9 +14,18 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/admin', static function () {
-    return view('admin.welcome');
-})->name('admin.welcome');
-Route::get('/admin/users', static function () {
-    return view('admin.user.index');
-})->name('admin.users');
+Route::group(
+    [
+        'prefix' => 'admin',
+        'as'     => 'admin.'
+    ], static function () {
+    Route::get('/', [HomePageController::class, 'index'])->name('index');
+    Route::group(
+        [
+            'prefix' => 'users',
+            'as'     => 'users.'
+        ], static function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('edit/{id?}', [UserController::class, 'edit'])->name('edit');
+    });
+});

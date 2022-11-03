@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRoleEnum;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,19 +28,25 @@ class UserController extends Controller
         View::share('role', $this->role);
     }
 
-    public function index()
+    public function list(): JsonResponse
     {
         try {
-            $data = User::query()->get();
-            $arr = [];
-            foreach ($data as $each) {
-                $arr[] = [
-                    'id' => $each->id,
-                    'username' => $each->username,
-                    'message' => "Hello [" . $each->username . "]",
-                ];
-            }
-            return $this->successResponse($arr);
+            $query = $this->model->clone()
+                ->where('role', UserRoleEnum::USER)
+                ->latest()->paginate();
+            $data['data']       = $query->getCollection();
+            $data['pagination'] = $query->linkCollection();
+            return $this->successResponse($data);
+        } catch (Throwable $e) {
+            return $this->errorResponse($e);
+        }
+    }
+
+    public function each($id): JsonResponse
+    {
+        try {
+            $data = $this->model->find($id);
+            return $this->successResponse($data);
         } catch (Throwable $e) {
             return $this->errorResponse($e);
         }
@@ -60,5 +67,10 @@ class UserController extends Controller
             DB::rollBack();
             return $this->errorResponse($e);
         }
+    }
+
+    public function destroy()
+    {
+        dd(1);
     }
 }

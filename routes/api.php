@@ -15,9 +15,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::middleware('auth:api')->get('/user', function (Request $request) {
-//    return $request->user();
+//Route::middleware('auth:api')->get('/users', function (Request $request) {
+//    return $request->users();
 //});
-
-Route::get('admin/users', [UserController::class, 'index'])->name('admin.users');
-Route::put('admin/users/edit/{id?}', [UserController::class, 'update'])->name('admin.users.update');
+Route::group(
+    [
+        'prefix' => 'admin',
+        'as'     => 'admin.'
+    ], static function () {
+    Route::group(
+        [
+            'prefix' => 'users',
+            'as'     => 'users.'
+        ], static function () {
+        Route::get('/{id?}', [UserController::class, 'each'])->name('each');
+        Route::get('list/{page?}', [UserController::class, 'list'])->name('list');
+        Route::put('edit/{id?}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy');
+    });
+});
