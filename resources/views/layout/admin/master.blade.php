@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>{{ config('app.name') }}</title>
+    <title>{{ $title ? $title.' | ' : '' }}{{ config('app.name') }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description">
     <meta content="Coderthemes" name="author">
     <!-- App favicon -->
-    {{--    <link rel="shortcut icon" href="assets/images/favicon.ico">--}}
+    <link rel="shortcut icon" href="{{asset('img/logo.png')}}">
 
     <!-- App css -->
     <link href="{{asset('css/icons.min.css')}}" rel="stylesheet" type="text/css">
@@ -16,7 +16,8 @@
     <link href="{{asset('css/app-modern-dark.min.css')}}" rel="stylesheet" type="text/css" id="dark-style">
     @stack('css')
 </head>
-<body class="loading" data-layout-config='{"leftSideBarTheme":"dark","layoutBoxed":false, "leftSidebarCondensed":false, "leftSidebarScrollable":false,"darkMode":false, "showRightSidebarOnStart": true}'>
+<body class="loading"
+      data-layout-config='{"leftSideBarTheme":"dark","layoutBoxed":false, "leftSidebarCondensed":false, "leftSidebarScrollable":false,"darkMode":false, "showRightSidebarOnStart": true}'>
 <div class="wrapper mm-active">
     @include('layout.admin.sidebar')
     <div class="content-page">
@@ -33,7 +34,7 @@
                                     <li class="breadcrumb-item active">Basic Tables</li>
                                 </ol>
                             </div>
-                            <h4 class="page-title">Basic Tables</h4>
+                            <h4 class="page-title">{{$title}}</h4>
                         </div>
                     </div>
                 </div>
@@ -165,6 +166,7 @@
 <!-- bundle -->
 <script src="{{asset('js/vendor.min.js')}}"></script>
 <script src="{{asset('js/app.min.js')}}"></script>
+<script src="{{asset('js/helper.js')}}"></script>
 @stack('js')
 </body>
 </html>
