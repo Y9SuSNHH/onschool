@@ -13,24 +13,32 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+//        $this->middleware('auth:api', ['except' => ['login']]);
+    }
+
+    public function me(): JsonResponse
+    {
+        return $this->successResponse(auth()->payload());
     }
 
     public function login(Request $request): JsonResponse
     {
         $credentials = $request->only('username', 'password');
-
-        if ($token = $this->guard()->attempt($credentials)) {
+        $token       = $this->guard()->attempt($credentials);
+        if ($token) {
             return $this->respondWithToken($token);
         }
 
         return $this->errorResponse('Unauthorized', 401);
     }
 
-    /**
-     * @param $token
-     * @return JsonResponse
-     */
+    public function logout(): JsonResponse
+    {
+        $this->guard()->logout();
+
+        return $this->successResponse([], 'Successfully logged out');
+    }
+
     protected function respondWithToken($token): JsonResponse
     {
         return $this->successResponse([
@@ -42,6 +50,6 @@ class AuthController extends Controller
 
     public function guard()
     {
-        return Auth::guard();
+        return auth()->guard();
     }
 }
