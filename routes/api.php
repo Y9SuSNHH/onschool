@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,9 +16,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::middleware('auth:api')->get('/users', function (Request $request) {
-//    return $request->users();
-//});
+Route::group([
+    'middleware' => 'api',
+    'prefix'     => 'auth',
+    'as'         => 'auth'
+], static function ($router) {
+
+    Route::post('login', [AuthController::class, 'login']);
+});
+
+
 Route::group(
     [
         'prefix' => 'admin',
@@ -28,8 +36,8 @@ Route::group(
             'prefix' => 'users',
             'as'     => 'users.'
         ], static function () {
+        Route::get('list', [UserController::class, 'list'])->name('list');
         Route::get('/{id?}', [UserController::class, 'profile'])->name('profile');
-        Route::get('list/{page?}', [UserController::class, 'list'])->name('list');
         Route::put('edit/{id?}', [UserController::class, 'update'])->name('update');
         Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy');
     });
