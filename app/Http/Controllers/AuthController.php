@@ -18,6 +18,7 @@ class AuthController extends Controller
 
     public function login(Request $request): JsonResponse
     {
+//        dd($request->all());
         $credentials = $request->only('username', 'password');
 
         if ($token = $this->guard()->attempt($credentials)) {
@@ -31,7 +32,7 @@ class AuthController extends Controller
      * @param $token
      * @return JsonResponse
      */
-    protected function respondWithToken($token): \Illuminate\Http\JsonResponse
+    protected function respondWithToken($token): JsonResponse
     {
         return $this->successResponse([
             'access_token' => $token,
