@@ -42,7 +42,7 @@ class UserController extends Controller
         }
     }
 
-    public function each($id): JsonResponse
+    public function profile($id): JsonResponse
     {
         try {
             $data = $this->model->find($id);
