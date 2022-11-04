@@ -55,7 +55,6 @@
                         let destroy_route = `{{ route("api.$role.$table.destroy")}}/` + each.id;
                         let destroy = `<a href="${destroy_route}" class="action-icon"><i class="mdi mdi-delete"></i></a>`;
                         let action = edit + destroy;
-                        // action += '<i class="mdi mdi-delete"></i>';
                         $('#table-data').append($('<tr>')
                             .append($('<td>').append(each.id))
                             .append($('<td>').append(each.username))
