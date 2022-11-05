@@ -1,3 +1,17 @@
+function setJWT(data) {
+    let JWT = {
+        access_token: data.access_token,
+        token_type: data.token_type,
+        expires_in: data.expires_in,
+    };
+    localStorage.setItem('JWT', JSON.stringify(JWT));
+}
+
+function getJWT() {
+    let stringJWT = localStorage.getItem('JWT');
+    return JSON.parse(stringJWT);
+}
+
 function convertDateToDateTime(date) {
     let m = new Date(date);
     return ("0" + m.getUTCHours()).slice(-2) + ":" +

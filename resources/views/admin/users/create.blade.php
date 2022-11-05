@@ -9,15 +9,14 @@
                         <div class="tab-pane show active" id="input-types-preview">
                             <form method="POST" id="form-edit">
                                 @csrf
-                                @method('PUT')
                                 <div class="form-row">
-                                    <div class="form-group col-md-5">
-                                        <label for="firstname">First name</label>
+                                    <div class="form-group col-md-4">
+                                        <label for="firstname">Firstname</label>
                                         <input type="text" id="firstname" name="firstname" class="form-control"
                                                required>
                                     </div>
-                                    <div class="form-group col-md-5">
-                                        <label for="lastname">Last name</label>
+                                    <div class="form-group col-md-4">
+                                        <label for="lastname">Lastname</label>
                                         <input type="text" id="lastname" name="lastname" class="form-control" required>
                                     </div>
                                     <div class="form-group col-md-2">
@@ -54,6 +53,20 @@
                                     </div>
                                 </div>
                                 <div class="form-row">
+                                    <div class="form-group col-md-4">
+                                        <label for="username">Username</label>
+                                        <input type="text" id="username" name="username" class="form-control" required>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="password">Password</label>
+                                        <input type="password" id="password" name="password" class="form-control" required>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="confirm_password">Confirm Password</label>
+                                        <input type="password" id="password" name="confirm_password" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary">Submit edit</button>
                                     </div>
@@ -66,60 +79,3 @@
         </div>
     </div>
 @endsection
-@push('js')
-    <script type="text/javascript">
-        function crawlData() {
-            const urlEdit = window.location.href;
-            const arrUrlEdit = urlEdit.split("/");
-            const id = arrUrlEdit[6];
-            $.ajax({
-                url: `{{route("api.$role.$table.profile")}}/${id}`,
-                type: 'GET',
-                dataType: 'JSON',
-                headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
-                success: function (response) {
-                    let each = response.data;
-                    let action = `{{route("api.$role.$table.update")}}/${id}`;
-                    $("#form-edit").attr('action', action);
-                    $("#username").html(each.username);
-                    $("input[name=firstname]").val(each.firstname);
-                    $("input[name=lastname]").val(each.lastname);
-                    each.gender ? $("#gender-male").prop("checked", true) : $("#gender-female").prop("checked", true);
-                    $("input[name=phone]").val(each.phone);
-                    $("input[name=email]").val(each.email);
-                    $("#select-role").val(each.role);
-                },
-                error: function () {
-                    notifyError("some error");
-                },
-            });
-        }
-
-        function submitForm(form, type) {
-            form.on('submit', function (event) {
-                event.preventDefault();
-                const formData = new FormData(form[0]);
-                $.ajax({
-                    url: form.attr('action'),
-                    type: type,
-                    dataType: 'JSON',
-                    data: formData,
-                    headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        notifySuccess(response.message);
-                    },
-                    error: function (response) {
-                        notifyError(response.responseJSON.message)
-                    },
-                });
-            });
-        }
-
-        $(document).ready(function () {
-            crawlData();
-            submitForm($("#form-edit"), "POST");
-        });
-    </script>
-@endpush

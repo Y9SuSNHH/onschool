@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRoleEnum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -13,28 +17,37 @@ class AuthController extends Controller
 
     public function __construct()
     {
-//        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('jwt.auth', ['except' => ['login']]);
     }
 
-    public function me(): JsonResponse
+    public function profile(): JsonResponse
     {
-        return $this->successResponse(auth()->payload());
+        return $this->successResponse(auth()->user());
     }
 
+    /**
+     * @throws ValidationException
+     */
     public function login(Request $request): JsonResponse
     {
-        $credentials = $request->only('username', 'password');
-        $token       = $this->guard()->attempt($credentials);
-        if ($token) {
-            return $this->respondWithToken($token);
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string',
+            'password' => 'required|string|min:6',
+        ]);
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->errors(), 422);
         }
 
-        return $this->errorResponse('Unauthorized', 401);
+        $token = auth()->attempt($validator->validated());
+        if (!$token) {
+            return $this->errorResponse('Unauthorized', 401);
+        }
+        return $this->respondWithToken($token);
     }
 
     public function logout(): JsonResponse
     {
-        $this->guard()->logout();
+        auth()->logout();
 
         return $this->successResponse([], 'Successfully logged out');
     }
@@ -44,12 +57,9 @@ class AuthController extends Controller
         return $this->successResponse([
             'access_token' => $token,
             'token_type'   => 'bearer',
-            'expires_in'   => $this->guard()->factory()->getTTL() * 60,
+            'expires_in'   => auth()->factory()->getTTL() * 60,
+            'role'         => strtolower(UserRoleEnum::getKey(auth()->user()->role)),
         ]);
     }
 
-    public function guard()
-    {
-        return auth()->guard();
-    }
 }

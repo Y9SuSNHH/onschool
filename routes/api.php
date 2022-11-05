@@ -16,28 +16,36 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('login', [AuthController::class, 'login'])->name('login');
+
 Route::group([
-    'middleware' => 'api',
+    'middleware' => 'jwt.auth',
 ], static function ($router) {
-    Route::post('login', [AuthController::class, 'login'])->name('login');
-    Route::post('me', [AuthController::class, 'me'])->name('me');
+    Route::post('profile', [AuthController::class, 'profile'])->name('profile');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-});
-
-
-Route::group(
-    [
-        'prefix' => 'admin',
-        'as'     => 'admin.'
-    ], static function () {
     Route::group(
         [
-            'prefix' => 'users',
-            'as'     => 'users.'
+            'prefix' => 'admin',
+            'as'     => 'admin.'
         ], static function () {
-        Route::get('list', [UserController::class, 'list'])->name('list');
-        Route::get('/{id?}', [UserController::class, 'profile'])->name('profile');
-        Route::put('edit/{id?}', [UserController::class, 'update'])->name('update');
-        Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy');
+        Route::group(
+            [
+                'prefix' => 'users',
+                'as'     => 'users.'
+            ], static function () {
+            Route::get('list', [UserController::class, 'list'])->name('list');
+            Route::get('update-active/{id?}', [UserController::class, 'updateActive'])->name('update.active');
+            Route::get('/{id?}', [UserController::class, 'profile'])->name('profile');
+            Route::put('edit/{id?}', [UserController::class, 'update'])->name('update');
+            Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy');
+        });
     });
+
+//    Route::group(
+//        [
+//            'prefix' => 'users',
+//            'as'     => 'users.'
+//        ], static function () {
+//
+//    });
 });

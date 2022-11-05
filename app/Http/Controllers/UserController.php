@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRoleEnum;
+use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,23 +16,23 @@ class UserController extends Controller
     use ResponseTrait;
 
     private object $model;
-    private string $table;
-    private string $role = 'admin';
+//    private string $table;
+//    private string $role = 'users';
 
     public function __construct()
     {
         $this->model = User::query();
-        $this->table = (new User())->getTable();
-
-        View::share('title', ucfirst('Quản lý người dùng'));
-        View::share('table', $this->table);
-        View::share('role', $this->role);
+//        $this->table = (new User())->getTable();
+//
+//        View::share('title', ucfirst('Quản lý người dùng'));
+//        View::share('table', $this->table);
+//        View::share('role', $this->role);
     }
 
     public function list(): JsonResponse
     {
         try {
-            $query = $this->model->clone()
+            $query              = $this->model->clone()
                 ->where('role', UserRoleEnum::USER)
                 ->latest()->paginate();
             $data['data']       = $query->getCollection();
@@ -52,25 +53,46 @@ class UserController extends Controller
         }
     }
 
-    public function update(Request $request, $userId): JsonResponse
+    public function updateActive($id): JsonResponse
     {
-//        dd($request->all());
+        DB::beginTransaction();
+        try {
+            $user = $this->model->find($id);
+            $user->active = !$user->active;
+            $user->save();
+            DB::commit();
+            return $this->successResponse([], 'Successfully updated active');
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return $this->errorResponse($e->getMessage());
+        }
+    }
+
+    public function update(UserUpdateRequest $request, $userId): JsonResponse
+    {
         DB::beginTransaction();
         try {
             $user = $this->model->find($userId);
-//            dd($request->username);
-            $user->username = $request->username;
+            $user->fill($request->validated());
             $user->save();
             DB::commit();
-            return $this->successResponse();
+            return $this->successResponse([], 'Edit user');
         } catch (Throwable $e) {
             DB::rollBack();
             return $this->errorResponse($e);
         }
     }
 
-    public function destroy()
+    public function destroy($id): JsonResponse
     {
-        dd(1);
+        DB::beginTransaction();
+        try {
+            User::destroy($id);
+            DB::commit();
+            return $this->successResponse([], 'Delete user');
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return $this->errorResponse($e->getMessage());
+        }
     }
 }

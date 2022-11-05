@@ -19,10 +19,10 @@
 <body class="loading"
       data-layout-config='{"leftSideBarTheme":"dark","layoutBoxed":false, "leftSidebarCondensed":false, "leftSidebarScrollable":false,"darkMode":false, "showRightSidebarOnStart": true}'>
 <div class="wrapper mm-active">
-    @include('layout.admin.sidebar')
+    @include('layout.users.sidebar')
     <div class="content-page">
         <div class="content">
-            @include('layout.admin.navbar ')
+            @include('layout.users.navbar ')
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
@@ -43,7 +43,7 @@
             <!-- container -->
 
         </div>
-        @include('layout.admin.footer')
+        @include('layout.users.footer')
     </div>
 </div>
 <div class="right-bar">
@@ -167,6 +167,32 @@
 <script src="{{asset('js/vendor.min.js')}}"></script>
 <script src="{{asset('js/app.min.js')}}"></script>
 <script src="{{asset('js/helper.js')}}"></script>
+<script type="text/javascript">
+    function submitForm(form, type) {
+        form.on('submit', function (event) {
+            event.preventDefault();
+            $.ajax({
+                url: form.attr('action'),
+                type: type,
+                dataType: 'JSON',
+                headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+                success: function (response) {
+                    notifySuccess(response.message);
+                    let route_login = `{{route('users.login')}}`
+                    window.location.href = `${route_login}`;
+                },
+                error: function (response) {
+                    console.log(response)
+                },
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        submitForm($("#form-logout"), "POST");
+    });
+</script>
+
 @stack('js')
 </body>
 </html>

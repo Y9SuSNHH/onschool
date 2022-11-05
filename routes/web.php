@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\HomePageController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\User\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,10 +15,13 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('users/login', [AuthController::class, 'login'])->name('users.login');
 Route::group(
     [
-        'prefix' => 'admin',
-        'as'     => 'admin.'
+//        'middleware' => 'jwt.auth',
+        'prefix'     => 'admin',
+        'as'         => 'admin.'
     ], static function () {
     Route::get('/', [HomePageController::class, 'index'])->name('index');
     Route::group(
@@ -26,6 +30,15 @@ Route::group(
             'as'     => 'users.'
         ], static function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('create', [UserController::class, 'create'])->name('create');
         Route::get('edit/{id?}', [UserController::class, 'edit'])->name('edit');
     });
+});
+Route::group(
+    [
+//        'middleware' => 'users',
+        'prefix'     => 'users',
+        'as'         => 'users.'
+    ], static function () {
+    Route::get('/', [HomePageController::class, 'index'])->name('index');
 });
