@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\HomePageController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\User\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,13 +16,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('users/login', [AuthController::class, 'login'])->name('users.login');
 Route::group(
     [
-//        'middleware' => 'jwt.auth',
-        'prefix'     => 'admin',
-        'as'         => 'admin.'
+        'prefix' => 'admin',
+        'as'     => 'admin.'
     ], static function () {
+    Route::get('login', [AuthController::class, 'login'])->name('login');
     Route::get('/', [HomePageController::class, 'index'])->name('index');
     Route::group(
         [
@@ -34,11 +33,4 @@ Route::group(
         Route::get('edit/{id?}', [UserController::class, 'edit'])->name('edit');
     });
 });
-Route::group(
-    [
-//        'middleware' => 'users',
-        'prefix'     => 'users',
-        'as'         => 'users.'
-    ], static function () {
-    Route::get('/', [HomePageController::class, 'index'])->name('index');
-});
+

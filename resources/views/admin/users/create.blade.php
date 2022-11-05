@@ -1,4 +1,11 @@
-@extends('layout.users.master')
+@extends('layout.admin.master')
+@push('css')
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+@endpush
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -7,24 +14,24 @@
                     <h4 class="header-title" id="username"></h4>
                     <div class="tab-content">
                         <div class="tab-pane show active" id="input-types-preview">
-                            <form method="POST" id="form-edit">
+                            <form action="{{route("api.$role.$table.store")}}" method="POST" id="form-edit">
                                 @csrf
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
                                         <label for="firstname">Firstname</label>
-                                        <input type="text" id="firstname" name="firstname" class="form-control"
-                                               required>
+                                        <input type="text" id="firstname" name="firstname" class="form-control">
+                                        <div class="invalid-feedback" id="error-firstname"></div>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="lastname">Lastname</label>
-                                        <input type="text" id="lastname" name="lastname" class="form-control" required>
+                                        <input type="text" id="lastname" name="lastname" class="form-control">
                                     </div>
                                     <div class="form-group col-md-2">
                                         <label for="gender">Gender</label>
                                         <br>
                                         <div class="custom-control custom-radio custom-control-inline">
                                             <input type="radio" id="gender-male" name="gender"
-                                                   class="custom-control-input" value="1">
+                                                   class="custom-control-input" value="1" checked>
                                             <label class="custom-control-label" for="gender-male">Male</label>
                                         </div>
                                         <div class="custom-control custom-radio custom-control-inline">
@@ -37,11 +44,11 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
                                         <label for="phone">Phone</label>
-                                        <input type="text" id="phone" name="phone" class="form-control" required>
+                                        <input type="number" id="phone" name="phone" class="form-control">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="email">Email</label>
-                                        <input type="text" id="email" name="email" class="form-control" required>
+                                        <input type="email" id="email" name="email" class="form-control">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="select-role">Role</label>
@@ -55,20 +62,21 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
                                         <label for="username">Username</label>
-                                        <input type="text" id="username" name="username" class="form-control" required>
+                                        <input type="text" id="username" name="username" class="form-control">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="password">Password</label>
-                                        <input type="password" id="password" name="password" class="form-control" required>
+                                        <input type="password" id="password" name="password" class="form-control">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="confirm_password">Confirm Password</label>
-                                        <input type="password" id="password" name="confirm_password" class="form-control" required>
+                                        <input type="password" id="password" name="confirm_password"
+                                               class="form-control">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <button type="submit" class="btn btn-primary">Submit edit</button>
+                                        <button type="button" class="btn btn-success">Create</button>
                                     </div>
                                 </div>
                             </form>
@@ -79,3 +87,92 @@
         </div>
     </div>
 @endsection
+@push('js')
+    <script src="{{ asset('js/jquery.validate.js')}}"></script>
+    <script type="text/javascript">
+        function showError(errors) {
+            let string = '<ul>';
+            if (Array.isArray(errors)) {
+                errors.forEach(function (each) {
+                    each.forEach(function (error) {
+                        string += `<li>${error}</li>`;
+                    });
+                });
+            } else {
+                string += `<li>${errors}</li>`;
+            }
+            string += '</ul>';
+            $("#div-error").html(string);
+            $("#div-error").removeClass("d-none").show();
+            notifyError(string);
+        }
+
+        function submitForm(form, type) {
+            form.on('submit', function (event) {
+                event.preventDefault();
+                const formData = new FormData(form[0]);
+                $.ajax({
+                    url: form.attr('action'),
+                    type: type,
+                    dataType: 'JSON',
+                    data: formData,
+                    headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        console.log(response)
+                    },
+                    error: function (response) {
+                        console.log(response)
+                    },
+                });
+            });
+        }
+
+        function submitFormCreate() {
+            $("#form-create").validate({
+                rules: {
+                    firstname: {
+                        required: true,
+                    },
+                    lastname: {
+                        required: true,
+                    },
+                    gender: {
+                        required: true,
+                        range: [0, 1],
+                    },
+                    phone: {
+                        required: true,
+                        minlength: 9,
+                        digits: true,
+                    },
+                    email: {
+                        required: true,
+                        email: true,
+                    },
+                    role: {
+                        required: true,
+                        range: [0, 1],
+                    },
+                    username: {
+                        required: true,
+                    },
+                    password: {
+                        required: true,
+                    },
+                    confirm_password: {
+                        equalTo: "#password"
+                    }
+                },
+                submitHandler: function () {
+                    submitForm(this, "POST");
+                },
+            });
+        }
+
+        $(document).ready(function () {
+            submitFormCreate();
+        })
+    </script>
+@endpush

@@ -19,10 +19,10 @@
 <body class="loading"
       data-layout-config='{"leftSideBarTheme":"dark","layoutBoxed":false, "leftSidebarCondensed":false, "leftSidebarScrollable":false,"darkMode":false, "showRightSidebarOnStart": true}'>
 <div class="wrapper mm-active">
-    @include('layout.users.sidebar')
+    @include('layout.admin.sidebar')
     <div class="content-page">
         <div class="content">
-            @include('layout.users.navbar ')
+            @include('layout.admin.navbar')
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
@@ -43,7 +43,7 @@
             <!-- container -->
 
         </div>
-        @include('layout.users.footer')
+        @include('layout.admin.footer')
     </div>
 </div>
 <div class="right-bar">
@@ -178,7 +178,7 @@
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
                 success: function (response) {
                     notifySuccess(response.message);
-                    let route_login = `{{route('users.login')}}`
+                    let route_login = `{{route('admin.login')}}`
                     window.location.href = `${route_login}`;
                 },
                 error: function (response) {

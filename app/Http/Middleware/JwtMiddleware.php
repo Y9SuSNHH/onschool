@@ -7,14 +7,14 @@ use App\Http\Controllers\ResponseTrait;
 use Closure;
 use Illuminate\Http\Request;
 
-class JWTMiddleware
+class JwtMiddleware
 {
     use ResponseTrait;
 
     public function handle($request, Closure $next)
     {
         if (!auth()->check()) {
-            return $this->errorResponse('Authorization error');
+            return $this->errorResponse('Unauthorized', 401);
         }
         return $next($request);
     }

@@ -10,17 +10,15 @@ use Illuminate\Support\Facades\View;
 
 class HomePageController extends Controller
 {
-    private object $model;
-    private string $title;
+//    private object $model;
+    private string $title='dashboard';
     private string $role = 'admin';
 
     public function __construct()
     {
-        $this->model = User::query();
-        $this->table = (new User())->getTable();
+//        $this->model = User::query();
 
-        View::share('title', ucfirst($this->table));
-        View::share('table', $this->table);
+        View::share('title', ucfirst($this->title));
         View::share('role', $this->role);
     }
 

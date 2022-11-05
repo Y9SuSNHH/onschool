@@ -1,6 +1,6 @@
 <div class="left-side-menu mm-show">
     <!-- LOGO -->
-    <a href="{{route("$role.index")}}" class="logo text-center logo-light">
+    <a href="{{route("admin.index")}}" class="logo text-center logo-light">
         <span class="logo-lg">
             <img src="{{asset('img/logo.png')}}" alt="" height="50">
         </span>
@@ -20,7 +20,7 @@
                             <ul class="metismenu side-nav mm-show">
                                 <li class="side-nav-title side-nav-item">homepage</li>
                                 <li class="side-nav-item">
-                                    <a href="{{route("$role.index")}}" class="side-nav-link">
+                                    <a href="{{route("admin.index")}}" class="side-nav-link">
                                         <i class="uil-home-alt"></i>
                                         <span class="badge badge-info badge-pill float-right"></span>
                                         <span>Dashboards</span>
@@ -28,7 +28,7 @@
                                 </li>
                                 <li class="side-nav-title side-nav-item">apps</li>
                                 <li class="side-nav-item">
-                                    <a href="{{ route("$role.$table.index") }}" class="side-nav-link">
+                                    <a href="{{ route("admin.users.index") }}" class="side-nav-link">
                                         <i class="uil uil-user"></i>
                                         <span class="badge badge-info badge-pill float-right"></span>
                                         <span>Users</span>

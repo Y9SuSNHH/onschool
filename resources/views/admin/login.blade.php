@@ -120,12 +120,7 @@
                 contentType: false,
                 success: function (response) {
                     setJWT(response.data);
-                    let route;
-                    if (response.data.role === 'admin') {
-                        route = `{{route('admin.index')}}`;
-                    } else if (response.data.role === 'user') {
-                        route = `{{route('users.index')}}`;
-                    }
+                    let route = `{{route('admin.index')}}`;
                     window.location.href = `${route}`;
                 },
                 error: function (response) {

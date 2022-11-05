@@ -1,4 +1,4 @@
-@extends('layout.users.master')
+@extends('layout.admin.master')
 @section('content')
     <div class="row">
         <div class="col-12">

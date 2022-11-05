@@ -17,7 +17,7 @@ class UserController extends Controller
 
     private object $model;
 //    private string $table;
-//    private string $role = 'users';
+//    private string $role = 'admin';
 
     public function __construct()
     {
@@ -32,14 +32,36 @@ class UserController extends Controller
     public function list(): JsonResponse
     {
         try {
-            $query              = $this->model->clone()
-                ->where('role', UserRoleEnum::USER)
-                ->latest()->paginate();
+            $query = $this->model->clone()->latest()->paginate();
+
             $data['data']       = $query->getCollection();
             $data['pagination'] = $query->linkCollection();
             return $this->successResponse($data);
         } catch (Throwable $e) {
             return $this->errorResponse($e);
+        }
+    }
+
+//    public function store(UserUpdateRequest $request): JsonResponse
+//    {
+//        try {
+//        } catch (Throwable $e) {
+//
+//        }
+//    }
+
+    public function updateActive($id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $user         = $this->model->find($id);
+            $user->active = !$user->active;
+            $user->save();
+            DB::commit();
+            return $this->successResponse([], 'Successfully updated active');
+        } catch (Throwable $e) {
+            DB::rollBack();
+            return $this->errorResponse($e->getMessage());
         }
     }
 
@@ -50,21 +72,6 @@ class UserController extends Controller
             return $this->successResponse($data);
         } catch (Throwable $e) {
             return $this->errorResponse($e);
-        }
-    }
-
-    public function updateActive($id): JsonResponse
-    {
-        DB::beginTransaction();
-        try {
-            $user = $this->model->find($id);
-            $user->active = !$user->active;
-            $user->save();
-            DB::commit();
-            return $this->successResponse([], 'Successfully updated active');
-        } catch (Throwable $e) {
-            DB::rollBack();
-            return $this->errorResponse($e->getMessage());
         }
     }
 

@@ -1,4 +1,4 @@
-@extends('layout.users.master')
+@extends('layout.admin.master')
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -14,12 +14,8 @@
                                     <thead class="thead-dark">
                                     <tr>
                                         <th>#</th>
+                                        <th>Information</th>
                                         <th>Username</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Gender</th>
-                                        <th>Phone</th>
-                                        <th>Email</th>
                                         <th>Active?</th>
                                         <th>Action</th>
                                     </tr>
@@ -73,7 +69,12 @@
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
                 success: function (response) {
                     response.data.data.forEach(function (each) {
-                        let email = each.email + '<br>' + formatToDate(each.email_verified_at);
+                        let gender = each.gender ? 'Male' : 'Female';
+                        let phone = `<a href="tel:${each.phone}">${each.phone}</a>`;
+                        let email = `<a href="mailto:${each.email}">${each.email}</a>` + '<br>' + formatToDate(each.email_verified_at);
+                        let information = each.firstname + `.${each.lastname} - ` + gender + `<br>` + phone + `<br>` + email;
+                        let role = each.role === {{\App\Enums\UserRoleEnum::ADMIN}} ? 'ADMIN' : 'USER';
+                        let username = each.username + ' - ' + role + `<br><a href="#">Forgotten password?</a>`;
                         let active = `<input type="checkbox" id="active-${each.id}" ${each.active ? 'checked' : ''} data-switch="success" onclick="userUpdateActive(${each.id})"/>
                         <label for="active-${each.id}" data-on-label="Yes" data-off-label="No" class="mb-0 d-block"></label>`;
                         let edit_route = `{{ route("$role.$table.edit")}}/` + each.id;
@@ -82,12 +83,8 @@
                         let action = edit + destroy;
                         $('#table-list').append($('<tr>')
                             .append($('<td>').append(each.id))
-                            .append($('<td>').append(each.username))
-                            .append($('<td>').append(each.firstname))
-                            .append($('<td>').append(each.lastname))
-                            .append($('<td>').append(each.gender ? 'Male' : 'Female'))
-                            .append($('<td>').append(each.phone))
-                            .append($('<td>').append(email))
+                            .append($('<td>').append(information))
+                            .append($('<td>').append(username))
                             .append($('<td class="text-center">').append(active))
                             .append($('<td class="table-action">').append(action))
                         );

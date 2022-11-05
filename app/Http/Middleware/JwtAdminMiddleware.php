@@ -7,13 +7,14 @@ use App\Http\Controllers\ResponseTrait;
 use Closure;
 use Illuminate\Http\Request;
 
-class AdminMiddleware
+class JwtAdminMiddleware
 {
     use ResponseTrait;
+
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || auth()->user()->role !== UserRoleEnum::ADMIN) {
-            return redirect()->route('users.login');
+        if (!auth()->user()->role !== UserRoleEnum::ADMIN) {
+            return $this->errorResponse('Incorrect permission');
         }
         return $next($request);
     }
