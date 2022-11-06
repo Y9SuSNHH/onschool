@@ -1,10 +1,18 @@
 @extends('layout.admin.master')
+@push('css')
+    <style>
+        .error {
+            color: red !important;
+        }
+    </style>
+@endpush
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     <h4 class="header-title" id="username"></h4>
+                    <div id="div-error" class="alert alert-danger d-none"></div>
                     <div class="tab-content">
                         <div class="tab-pane show active" id="input-types-preview">
                             <form method="POST" id="form-edit">
@@ -42,11 +50,12 @@
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="email">Email</label>
-                                        <input type="text" id="email" name="email" class="form-control" required>
+                                        <input type="email" id="email" name="email" class="form-control" required>
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-4" id="div-role">
                                         <label for="select-role">Role</label>
                                         <select class="form-control" id="select-role" name="role">
+                                            <option value="" selected>Choose...</option>
                                             @foreach(\App\Enums\UserRoleEnum::asArray() as $key => $value)
                                                 <option value="{{ $value }}">{{ $key}}</option>
                                             @endforeach
@@ -67,13 +76,31 @@
     </div>
 @endsection
 @push('js')
+    <script src="{{ asset('js/jquery.validate.js')}}"></script>
     <script type="text/javascript">
+        function showError(errors) {
+            let string = '<ul>';
+            console.log(errors);
+            if (Array.isArray(errors)) {
+                errors.forEach(function (each) {
+                    each.forEach(function (error) {
+                        string += `<li>${error}</li>`;
+                    });
+                });
+            } else {
+                string += `<li>${errors}</li>`;
+            }
+            string += '</ul>';
+            $("#div-error").html(string);
+            $("#div-error").removeClass("d-none").show();
+        }
+
         function crawlData() {
             const urlEdit = window.location.href;
             const arrUrlEdit = urlEdit.split("/");
             const id = arrUrlEdit[6];
             $.ajax({
-                url: `{{route("api.$role.$table.profile")}}/${id}`,
+                url: `{{route("api.$role.$table.show")}}/${id}`,
                 type: 'GET',
                 dataType: 'JSON',
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
@@ -87,7 +114,8 @@
                     each.gender ? $("#gender-male").prop("checked", true) : $("#gender-female").prop("checked", true);
                     $("input[name=phone]").val(each.phone);
                     $("input[name=email]").val(each.email);
-                    $("#select-role").val(each.role);
+
+                    $(`#select-role option[value=${each.role}]`).attr("selected", "selected");
                 },
                 error: function () {
                     notifyError("some error");
@@ -96,30 +124,72 @@
         }
 
         function submitForm(form, type) {
-            form.on('submit', function (event) {
-                event.preventDefault();
-                const formData = new FormData(form[0]);
-                $.ajax({
-                    url: form.attr('action'),
-                    type: type,
-                    dataType: 'JSON',
-                    data: formData,
-                    headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        notifySuccess(response.message);
+            const formData = new FormData(form[0]);
+            $.ajax({
+                url: form.attr('action'),
+                type: type,
+                dataType: 'JSON',
+                data: formData,
+                headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log(response);
+                    $("#div-error").addClass("d-none")
+                    notifySuccess(response.message);
+                },
+                error: function (response) {
+                    console.log(response);
+                    notifyError(response.statusText);
+                    let errors;
+                    if (response.responseJSON.errors) {
+                        errors = Object.values(response.responseJSON.errors);
+                        showError(errors);
+                    } else {
+                        errors = response.responseJSON.message.errorInfo[2].split("for");
+                        showError(errors[0]);
+                    }
+                },
+            });
+        }
+
+        function submitFormEdit() {
+            $("#form-edit").validate({
+                rules: {
+                    firstname: {
+                        required: true,
                     },
-                    error: function (response) {
-                        notifyError(response.responseJSON.message)
+                    lastname: {
+                        required: true,
                     },
-                });
+                    gender: {
+                        required: true,
+                        range: [0, 1],
+                    },
+                    phone: {
+                        required: true,
+                        minlength: 9,
+                        digits: true,
+                    },
+                    email: {
+                        required: true,
+                        email: true,
+                    },
+                    role: {
+                        required: true,
+                        range: [1, 2],
+                    },
+                },
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    submitForm($("#form-edit"), "POST");
+                },
             });
         }
 
         $(document).ready(function () {
             crawlData();
-            submitForm($("#form-edit"), "POST");
+            submitFormEdit()
         });
     </script>
 @endpush
