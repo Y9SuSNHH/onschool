@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\HomePageController;
+use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,15 @@ Route::group(
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('create', [UserController::class, 'create'])->name('create');
         Route::get('edit/{id?}', [UserController::class, 'edit'])->name('edit');
+    });
+    Route::group(
+        [
+            'prefix' => 'students',
+            'as'     => 'students.'
+        ], static function () {
+        Route::get('/', [StudentController::class, 'index'])->name('index');
+        Route::get('create', [StudentController::class, 'create'])->name('create');
+        Route::get('edit/{id?}', [StudentController::class, 'edit'])->name('edit');
     });
 });
 

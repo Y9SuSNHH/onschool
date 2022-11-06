@@ -34,6 +34,13 @@
                                         <span>Users</span>
                                     </a>
                                 </li>
+                                <li class="side-nav-item">
+                                    <a href="{{ route("admin.students.index") }}" class="side-nav-link">
+                                        <i class="dripicons-user-group"></i>
+                                        <span class="badge badge-info badge-pill float-right"></span>
+                                        <span>Students</span>
+                                    </a>
+                                </li>
                             </ul>
                             <div class="clearfix"></div>
                         </div>
