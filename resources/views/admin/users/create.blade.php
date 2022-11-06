@@ -11,10 +11,10 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title" id="username"></h4>
+                    <div id="div-error" class="alert alert-danger d-none"></div>
                     <div class="tab-content">
                         <div class="tab-pane show active" id="input-types-preview">
-                            <form action="{{route("api.$role.$table.store")}}" method="POST" id="form-edit">
+                            <form action="{{route("api.$role.$table.store")}}" method="POST" id="form-create">
                                 @csrf
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
@@ -53,6 +53,7 @@
                                     <div class="form-group col-md-4">
                                         <label for="select-role">Role</label>
                                         <select class="form-control" id="select-role" name="role">
+                                            <option value="">Choose...</option>
                                             @foreach(\App\Enums\UserRoleEnum::asArray() as $key => $value)
                                                 <option value="{{ $value }}">{{ $key}}</option>
                                             @endforeach
@@ -70,13 +71,13 @@
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="confirm_password">Confirm Password</label>
-                                        <input type="password" id="password" name="confirm_password"
+                                        <input type="password" id="confirm_password" name="confirm_password"
                                                class="form-control">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-success">Create</button>
+                                        <button type="submit" class="btn btn-success">Create</button>
                                     </div>
                                 </div>
                             </form>
@@ -104,28 +105,32 @@
             string += '</ul>';
             $("#div-error").html(string);
             $("#div-error").removeClass("d-none").show();
-            notifyError(string);
         }
 
         function submitForm(form, type) {
-            form.on('submit', function (event) {
-                event.preventDefault();
-                const formData = new FormData(form[0]);
-                $.ajax({
-                    url: form.attr('action'),
-                    type: type,
-                    dataType: 'JSON',
-                    data: formData,
-                    headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        console.log(response)
-                    },
-                    error: function (response) {
-                        console.log(response)
-                    },
-                });
+            const formData = new FormData(form[0]);
+            $.ajax({
+                url: form.attr('action'),
+                type: type,
+                dataType: 'JSON',
+                data: formData,
+                headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    notifySuccess(response.message);
+                },
+                error: function (response) {
+                    notifyError(response.responseJSON.message);
+                    let errors;
+                    if (response.responseJSON.errors) {
+                        errors = Object.values(response.responseJSON.errors);
+                        showError(errors);
+                    } else {
+                        errors = response.responseJSON.message;
+                        showError(errors);
+                    }
+                },
             });
         }
 
@@ -153,26 +158,30 @@
                     },
                     role: {
                         required: true,
-                        range: [0, 1],
+                        range: [1, 2],
                     },
                     username: {
                         required: true,
                     },
                     password: {
                         required: true,
+                        minlength: 6,
                     },
                     confirm_password: {
-                        equalTo: "#password"
+                        required: true,
+                        minlength: 6,
+                        equalTo: "#password",
                     }
                 },
-                submitHandler: function () {
-                    submitForm(this, "POST");
+                submitHandler: function (form, event) {
+                    event.preventDefault();
+                    submitForm($("#form-create"), "POST");
                 },
             });
         }
 
         $(document).ready(function () {
-            submitFormCreate();
+            submitFormCreate()
         })
     </script>
 @endpush

@@ -48,12 +48,12 @@ class JwtController extends Controller
                 return $this->errorResponse('Incorrect password');
             }
 
-            $payload = [
-                'username' => $user->username,
-                'role'     => $user->role,
-            ];
-
-            $token   = auth()->claims($payload)->login($user);
+//            $payload = [
+//                'username' => $user->username,
+//                'role'     => $user->role,
+//            ];
+//            $token   = auth()->claims($payload)->login($user);
+            $token   = auth()->login($user);
             if (!$token) {
                 return $this->errorResponse('Unauthorized', 401);
             }

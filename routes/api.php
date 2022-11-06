@@ -34,9 +34,9 @@ Route::group([
                 'as'     => 'users.'
             ], static function () {
             Route::get('list', [UserController::class, 'list'])->name('list');
-            Route::get('create', [UserController::class, 'store'])->name('store');
+            Route::post('create', [UserController::class, 'store'])->name('store');
+            Route::get('/{id?}', [UserController::class, 'show'])->name('show');
             Route::get('update-active/{id?}', [UserController::class, 'updateActive'])->name('update.active');
-            Route::get('/{id?}', [UserController::class, 'profile'])->name('profile');
             Route::put('edit/{id?}', [UserController::class, 'update'])->name('update');
             Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy')->middleware('jwt.admin');
         });
