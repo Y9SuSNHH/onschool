@@ -71,11 +71,12 @@
                     response.data.data.forEach(function (each) {
                         let gender = each.gender ? 'Male' : 'Female';
                         let phone = `<a href="tel:${each.phone}">${each.phone}</a>`;
-                        let email = `<a href="mailto:${each.email}">${each.email}</a>` + '<br>' + formatToDate(each.email_verified_at);
+                        // let email = `<a href="mailto:${each.email}">${each.email}</a>` + '<br>' + formatToDate(each.email_verified_at);
+                        let email = `<a href="mailto:${each.email}">${each.email}</a>`;
                         let information = each.firstname + `.${each.lastname} - ` + gender + `<br>` + phone + `<br>` + email;
                         let role = each.role === {{\App\Enums\UserRoleEnum::ADMIN}} ? 'ADMIN' : 'USER';
                         let username = each.username + ' - ' + role + `<br><a href="#">Forgotten password?</a>`;
-                        let active = `<input type="checkbox" id="active-${each.id}" ${each.active ? 'checked' : ''} data-switch="success" onclick="userUpdateActive(${each.id})"/>
+                        let active = `<input type="checkbox" id="active-${each.id}" ${each.active ? 'checked' : ''}  data-switch="success" onclick="userUpdateActive(${each.id})"/>
                         <label for="active-${each.id}" data-on-label="Yes" data-off-label="No" class="mb-0 d-block"></label>`;
                         let edit_route = `{{ route("$role.$table.edit")}}/` + each.id;
                         let edit = `<a href="${edit_route}" class="action-icon"><i class="mdi mdi-pencil"></i></a>`;
@@ -91,8 +92,8 @@
                     });
                     renderPagination(response.data.pagination);
                 },
-                error: function () {
-                    notifyError("some error");
+                error: function (response) {
+                    notifyError(response.statusText);
                 },
             });
         }
@@ -129,17 +130,15 @@
         }
 
         function userUpdateActive(id) {
-            $("#active-" + id).change(function () {
-                $.ajax({
-                    url: `{{route("api.admin.users.update.active")}}/${id}`,
-                    type: "GET",
-                    dataType: "JSON",
-                    headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
-                    success: function (response) {
-                        notifySuccess(response.message);
-                    }
-                });
-            })
+            $.ajax({
+                url: `{{route("api.admin.users.update.active")}}/${id}`,
+                type: "GET",
+                dataType: "JSON",
+                headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+                success: function (response) {
+                    notifySuccess(response.message);
+                }
+            });
         }
 
         $(document).ready(function () {
