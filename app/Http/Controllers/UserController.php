@@ -105,6 +105,7 @@ class UserController extends Controller
         try {
             $user = $this->model->find($userId);
             $user->fill($request->validated());
+            $user->updated_by = auth()->user()->id;
             $user->save();
             DB::commit();
             return $this->successResponse([], 'Edit user');
