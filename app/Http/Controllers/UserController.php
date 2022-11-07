@@ -119,7 +119,9 @@ class UserController extends Controller
     {
         DB::beginTransaction();
         try {
-            User::destroy($id);
+            $user = $this->model->where('id', $id)->firstOrFail();
+            $user->deleted_by = auth()->user()->id;
+            $user->delete();
             DB::commit();
             return $this->successResponse([], 'Delete user');
         } catch (Throwable $e) {
