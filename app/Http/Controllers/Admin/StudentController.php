@@ -27,4 +27,14 @@ class StudentController extends Controller
     {
         return view("$this->role.$this->table.index");
     }
+
+    public function create()
+    {
+        return view("$this->role.$this->table.create");
+    }
+
+    public function edit()
+    {
+        return view("$this->role.$this->table.edit");
+    }
 }

@@ -43,6 +43,11 @@ function renderPagination(links) {
             .append(`<a class="page-link" onclick="changePage(${page})">${each.label}</a>`));
     })
 }
+function changePage(page) {
+    let urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('page', page);
+    window.location.search = urlParams;
+}
 
 function formatToDate(date) {
     const format = new Date(date);
