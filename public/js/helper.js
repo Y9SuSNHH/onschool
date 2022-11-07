@@ -1,14 +1,14 @@
-function setJWT(data) {
+function setJwtLocalStorage(data) {
     let JWT = {
         access_token: data.access_token,
         token_type: data.token_type,
         expires_in: data.expires_in,
     };
-    localStorage.setItem('JWT', JSON.stringify(JWT));
+    localStorage.setItem('Jwt', JSON.stringify(JWT));
 }
 
 function getJWT() {
-    let stringJWT = localStorage.getItem('JWT');
+    let stringJWT = localStorage.getItem('Jwt');
     return JSON.parse(stringJWT);
 }
 
@@ -22,9 +22,12 @@ function convertDateToDateTime(date) {
 }
 
 function renderPagination(links) {
+    let page =
     links.forEach(function (each) {
         let disable = false;
-        let pageNow = each.active ? each.label : 2;
+        if (each.active) {
+            pageNow = each.label;
+        }
         let page = each.label;
         if (each.label === "&laquo; Previous") {
             if (links[1].active === true) {
@@ -43,6 +46,7 @@ function renderPagination(links) {
             .append(`<a class="page-link" onclick="changePage(${page})">${each.label}</a>`));
     })
 }
+
 function changePage(page) {
     let urlParams = new URLSearchParams(window.location.search);
     urlParams.set('page', page);

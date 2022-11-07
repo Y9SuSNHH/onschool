@@ -39,7 +39,7 @@
                             <p class="text-muted mb-4">Enter your username and password to access manage.</p>
                         </div>
 
-                        <form action="{{route('api.login')}}" method="POST" id="form-login">
+                        <form action="{{route('api.auth.login')}}" method="POST" id="form-login">
                             @csrf
                             <div class="form-group">
                                 <label for="username">Username</label>
@@ -119,7 +119,7 @@
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    setJWT(response.data);
+                    setJwtLocalStorage(response.data);
                     let route = `{{route('admin.index')}}`;
                     window.location.href = `${route}`;
                 },

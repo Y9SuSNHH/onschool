@@ -61,7 +61,7 @@
                 </a>
 
                 <!-- item-->
-                <form action="{{route('api.logout')}}" method="POST" id="form-logout">
+                <form action="{{route('api.auth.logout')}}" method="POST" id="form-logout">
                     @csrf
                     <button type="submit" class="dropdown-item notify-item"><i class="mdi mdi-logout mr-1"></i><span>Logout</span>
                     </button>
