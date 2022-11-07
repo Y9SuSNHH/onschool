@@ -123,11 +123,6 @@
             });
         }
 
-        function changePage(page) {
-            let urlParams = new URLSearchParams(window.location.search);
-            urlParams.set('page', page);
-            window.location.search = urlParams;
-        }
 
         function userUpdateActive(id) {
             $.ajax({
