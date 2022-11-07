@@ -15,7 +15,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Information</th>
-                                        <th>Username</th>
+                                        <th>User</th>
                                         <th>Active?</th>
                                         <th>Action</th>
                                     </tr>
@@ -75,7 +75,7 @@
                         let email = `<a href="mailto:${each.email}">${each.email}</a>`;
                         let information = each.firstname + `.${each.lastname} - ` + gender + `<br>` + phone + `<br>` + email;
                         let role = each.role === {{\App\Enums\UserRoleEnum::ADMIN}} ? 'ADMIN' : 'USER';
-                        let username = each.username + ' - ' + role + `<br><a href="#">Forgotten password?</a>`;
+                        let user = each.username + ' - ' + role + `<br><a href="#">Forgotten password?</a>`;
                         let active = `<input type="checkbox" id="active-${each.id}" ${each.active ? 'checked' : ''}  data-switch="success" onclick="userUpdateActive(${each.id})"/>
                         <label for="active-${each.id}" data-on-label="Yes" data-off-label="No" class="mb-0 d-block"></label>`;
                         let edit_route = `{{ route("$role.$table.edit")}}/` + each.id;
@@ -85,7 +85,7 @@
                         $('#table-list').append($('<tr>')
                             .append($('<td>').append(each.id))
                             .append($('<td>').append(information))
-                            .append($('<td>').append(username))
+                            .append($('<td>').append(user))
                             .append($('<td class="text-center">').append(active))
                             .append($('<td class="table-action">').append(action))
                         );
