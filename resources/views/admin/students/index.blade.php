@@ -7,24 +7,22 @@
                     <a href="{{route("$role.$table.create")}}" class="btn btn-success">Create</a>
                 </div>
                 <div class="card-body">
-                    <div class="card-body">
-                        <div class="tab-content">
-                            <div class="tab-pane show active" id="responsive-preview">
-                                <div class="table-responsive">
-                                    <table class="table table-centered mb-0" id="table-list">
-                                        <thead class="thead-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Information</th>
-                                            <th>Identification</th>
-                                            <th>Contact</th>
-                                            <th>User</th>
-                                            <th>Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
+                    <div class="tab-content">
+                        <div class="tab-pane show active" id="responsive-preview">
+                            <div class="table-responsive">
+                                <table class="table table-centered mb-0" id="table-list">
+                                    <thead class="thead-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Information</th>
+                                        <th>Identification</th>
+                                        <th>Contact</th>
+                                        <th>User</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -38,6 +36,24 @@
             </div>
         </div>
     </div>
+    <div id="warning-alert-delete" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body p-4">
+                    <div class="text-center">
+                        <i class="dripicons-warning h1 text-warning"></i>
+                        <h4 class="mt-2">ARE YOU SURE?</h4>
+                        <p class="mt-3">After delete you can restore this user in trash of users</p>
+                        <form method="POST" id="form-delete">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-warning my-2">DELETE</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('js')
     <script type="text/javascript">
@@ -46,6 +62,7 @@
         }
 
         function crawlData() {
+            $('#card').load(location.href + " #card");
             $.ajax({
                 url: `{{route("api.$role.$table.list")}}`,
                 type: 'GET',
@@ -83,8 +100,33 @@
             });
         }
 
+        function submitForm(form, type) {
+            form.on('submit', function (event) {
+                event.preventDefault();
+                const formData = new FormData(form[0]);
+                $.ajax({
+                    url: form.attr('action'),
+                    type: type,
+                    dataType: 'JSON',
+                    data: formData,
+                    headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        notifySuccess(response.message);
+                        crawlData();
+                        $("#warning-alert-delete").modal('hide');
+                    },
+                    error: function (response) {
+                        notifyError(response.responseJSON.message)
+                    },
+                });
+            });
+        }
+
         $(document).ready(function () {
             crawlData();
+            submitForm($("#form-delete"), "DELETE");
         });
     </script>
 @endpush

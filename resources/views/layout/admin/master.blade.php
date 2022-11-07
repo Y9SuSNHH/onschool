@@ -168,7 +168,7 @@
 <script src="{{asset('js/app.min.js')}}"></script>
 <script src="{{asset('js/helper.js')}}"></script>
 <script type="text/javascript">
-    function submitFormLogout(form, type) {
+        function submitFormLogout(form, type) {
         form.on('submit', function (event) {
             event.preventDefault();
             $.ajax({
