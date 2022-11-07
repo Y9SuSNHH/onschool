@@ -17,13 +17,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('login', [JwtController::class, 'login'])->name('login');
+Route::post('auth/login', [JwtController::class, 'login'])->name('auth.login');
 
 Route::group([
-    'middleware' => 'jwt.auth',
+    'middleware' => ['jwt.auth', 'permission'],
 ], static function ($router) {
-    Route::post('profile', [JwtController::class, 'profile'])->name('profile');
-    Route::post('logout', [JwtController::class, 'logout'])->name('logout');
+    Route::group(
+        [
+            'prefix' => 'auth',
+            'as'     => 'auth.'
+        ], static function () {
+        Route::post('profile', [JwtController::class, 'profile'])->name('profile');
+        Route::post('payload', [JwtController::class, 'payload'])->name('payload');
+        Route::post('logout', [JwtController::class, 'logout'])->name('logout');
+    });
     Route::group(
         [
             'prefix' => 'admin',
@@ -39,7 +46,7 @@ Route::group([
             Route::get('/{id?}', [UserController::class, 'show'])->name('show');
             Route::get('update-active/{id?}', [UserController::class, 'updateActive'])->name('update.active');
             Route::put('edit/{id?}', [UserController::class, 'update'])->name('update');
-            Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy')->middleware('jwt.admin');
+            Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy');
         });
         Route::group(
             [
@@ -50,7 +57,7 @@ Route::group([
             Route::post('create', [StudentController::class, 'store'])->name('store');
             Route::get('/{id?}', [StudentController::class, 'show'])->name('show');
             Route::put('edit/{id?}', [StudentController::class, 'update'])->name('update');
-            Route::delete('/{id?}', [StudentController::class, 'destroy'])->name('destroy')->middleware('jwt.admin');
+            Route::delete('/{id?}', [StudentController::class, 'destroy'])->name('destroy');
         });
     });
 });

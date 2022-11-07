@@ -27,6 +27,11 @@ class JwtController extends Controller
         return $this->successResponse(auth()->user());
     }
 
+    public function payload(): JsonResponse
+    {
+        return $this->successResponse(auth()->payload());
+    }
+
     /**
      * @throws ValidationException
      */
@@ -40,19 +45,16 @@ class JwtController extends Controller
             if ($validator->fails()) {
                 return $this->errorResponse($validator->errors(), 422);
             }
-
-            $user = User::query()
-                ->where('username', $request->get('username'))
-                ->firstOrFail();
-            if (!Hash::check($request->get('password'), $user->password)) {
+            $data = $validator->validated();
+            $user = User::query()->where('username', $data['username'])->firstOrFail();
+            if (!Hash::check($data['password'], $user->password)) {
                 return $this->errorResponse('Incorrect password');
             }
-
-//            $payload = [
+            $payload = [
 //                'username' => $user->username,
-//                'role'     => $user->role,
-//            ];
-//            $token   = auth()->claims($payload)->login($user);
+                'role' => $user->role,
+            ];
+            $token   = auth()->claims($payload)->login($user);
             $token   = auth()->login($user);
             if (!$token) {
                 return $this->errorResponse('Unauthorized', 401);
