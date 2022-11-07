@@ -13,7 +13,7 @@ class JwtAdminMiddleware
 
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->user()->role !== UserRoleEnum::ADMIN) {
+        if (auth()->user()->role !== UserRoleEnum::ADMIN) {
             return $this->errorResponse('Incorrect permission');
         }
         return $next($request);
