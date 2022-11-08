@@ -21,13 +21,9 @@ function convertDateToDateTime(date) {
         m.getUTCFullYear();
 }
 
-function renderPagination(links) {
-    let page =
+function renderPagination(links,pageNow) {
     links.forEach(function (each) {
         let disable = false;
-        if (each.active) {
-            pageNow = each.label;
-        }
         let page = each.label;
         if (each.label === "&laquo; Previous") {
             if (links[1].active === true) {

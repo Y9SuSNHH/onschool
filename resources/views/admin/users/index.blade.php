@@ -6,20 +6,20 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-lg-6">
-{{--                            <form class="form-inline">--}}
-{{--                                <div class="form-group mb-2">--}}
-{{--                                    <label for="inputPassword2" class="sr-only">Search</label>--}}
-{{--                                    <input type="search" class="form-control" id="inputPassword2"--}}
-{{--                                           placeholder="Search...">--}}
-{{--                                </div>--}}
-{{--                                <div class="form-group mx-sm-3 mb-2">--}}
-{{--                                    <select class="custom-select" id="status-select">--}}
-{{--                                        <option>Without deleted records</option>--}}
-{{--                                        <option value="0">With deleted records</option>--}}
-{{--                                        <option value="1">Only deleted records</option>--}}
-{{--                                    </select>--}}
-{{--                                </div>--}}
-{{--                            </form>--}}
+                            {{--                            <form class="form-inline">--}}
+                            {{--                                <div class="form-group mb-2">--}}
+                            {{--                                    <label for="inputPassword2" class="sr-only">Search</label>--}}
+                            {{--                                    <input type="search" class="form-control" id="inputPassword2"--}}
+                            {{--                                           placeholder="Search...">--}}
+                            {{--                                </div>--}}
+                            {{--                                <div class="form-group mx-sm-3 mb-2">--}}
+                            {{--                                    <select class="custom-select" id="status-select">--}}
+                            {{--                                        <option>Without deleted records</option>--}}
+                            {{--                                        <option value="0">With deleted records</option>--}}
+                            {{--                                        <option value="1">Only deleted records</option>--}}
+                            {{--                                    </select>--}}
+                            {{--                                </div>--}}
+                            {{--                            </form>--}}
                         </div>
                         <div class="col-lg-6">
                             <div class="text-lg-right">
@@ -113,7 +113,7 @@
                             .append($('<td class="table-action">').append(action))
                         );
                     });
-                    renderPagination(response.data.pagination);
+                    renderPagination(response.data.pagination, {{ request()->get('page') ?? 1 }});
                 },
                 error: function (response) {
                     notifyError(response.statusText);
@@ -154,6 +154,9 @@
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
                 success: function (response) {
                     notifySuccess(response.message);
+                },
+                error: function (response) {
+                    notifyError(response.responseJSON.message)
                 }
             });
         }
