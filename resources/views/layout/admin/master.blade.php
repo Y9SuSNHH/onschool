@@ -168,14 +168,18 @@
 <script src="{{asset('js/app.min.js')}}"></script>
 <script src="{{asset('js/helper.js')}}"></script>
 <script type="text/javascript">
-        function submitFormLogout(form, type) {
+    function submitFormLogout(form, type) {
         form.on('submit', function (event) {
             event.preventDefault();
+            const formData = new FormData(form[0]);
             $.ajax({
                 url: form.attr('action'),
                 type: type,
                 dataType: 'JSON',
+                data: formData,
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+                processData: false,
+                contentType: false,
                 success: function (response) {
                     notifySuccess(response.message);
                     let route_login = `{{route('admin.login')}}`
