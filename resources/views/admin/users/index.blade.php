@@ -5,14 +5,14 @@
             <div class="card" id="card">
                 <div class="card-header">
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-md-12">
                             <form class="form-inline" id="form-filter">
-                                <div class="form-group mb-2">
-                                    <label for="username" class="sr-only">Search</label>
+                                <div class="form-group mr-1">
+                                    <label for="filter-username" class="sr-only">Search username</label>
                                     <input type="search" class="form-control filter-change" id="filter-username"
-                                           name="username" placeholder="Search...">
+                                           name="username" placeholder="Search username...">
                                 </div>
-                                <div class="form-group mx-sm-3 mb-2">
+                                <div class="form-group mr-1">
                                     <select class="custom-select filter-change" name="deleted_type"
                                             id="filter-deleted-type">
                                         <option value="0" selected>Without deleted records</option>
@@ -20,40 +20,63 @@
                                         <option value="1">Only deleted records</option>
                                     </select>
                                 </div>
+                                <div class="form-group mr-1">
+                                    <select class="custom-select filter-change" name="active"
+                                            id="filter-active">
+                                        <option value="1" selected>With active records</option>
+                                        <option value="0">With disable records</option>
+                                        <option value="All">All status records</option>
+                                    </select>
+                                </div>
                             </form>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="text-lg-right">
-                                <a href="{{route("$role.$table.create")}}" class="btn btn-success">Create</a>
-                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="tab-content">
-                        <div class="tab-pane show active" id="responsive-preview">
-                            <div class="table-responsive">
-                                <table class="table table-centered mb-0" id="table-list">
-                                    <thead class="thead-dark">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Information</th>
-                                        <th>User</th>
-                                        <th>Active?</th>
-                                        <th>Action</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <a href="{{route("$role.$table.create")}}" class="btn btn-danger mb-2"><i
+                                    class="mdi mdi-plus-circle mr-2"></i> Add User</a>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="text-sm-right">
+                                <button type="button" class="btn btn-success mb-2 mr-1"><i
+                                        class="mdi mdi-settings"></i></button>
+                                <button type="button" class="btn btn-light mb-2 mr-1">Import</button>
+                                <button type="button" class="btn btn-light mb-2">Export</button>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-footer">
-                    <nav>
-                        <ul class="pagination pagination-rounded mb-0" id="pagination">
-                        </ul>
-                    </nav>
+                    <div id="crawl-data">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="tab-content">
+                                    <div class="table-responsive">
+                                        <table class="table mb-0" id="table-list">
+                                            <thead class="thead-dark">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Information</th>
+                                                <th>User</th>
+                                                <th>Active?</th>
+                                                <th>Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="dataTables_paginate paging_simple_numbers"
+                                     id="products-datatable_paginate">
+                                    <ul class="pagination pagination-rounded mb-0" id="pagination"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -83,15 +106,16 @@
             $("#form-delete").attr('action', `{{route("api.$role.$table.destroy")}}/${id}`)
         }
 
-        function crawlData() {
+        function crawlData(page = 1) {
             $.ajax({
                 url: `{{route("api.$role.$table.list")}}`,
                 type: 'GET',
                 dataType: 'JSON',
                 data: {
-                    page: {{ request()->get('page') ?? 1 }},
+                    page,
                     username: $("input[name=username]").val(),
                     deleted_type: $("select[name=deleted_type]").val(),
+                    active: $("select[name=active]").val(),
                 },
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
                 success: function (response) {
@@ -117,7 +141,7 @@
                             .append($('<td class="table-action">').append(action))
                         );
                     });
-                    renderPagination(response.data.pagination, {{ request()->get('page') ?? 1 }});
+                    renderPagination(response.data.pagination, page);
                 },
                 error: function (response) {
                     notifyError(response.statusText);
@@ -142,8 +166,7 @@
                     contentType: false,
                     success: function (response) {
                         notifySuccess(response.message);
-                        $('.card-body').load(location.href + " .card-body");
-                        $('.card-footer').load(location.href + " .card-footer");
+                        $('#crawl-data').load(location.href + " #crawl-data");
                         crawlData();
                         $("#warning-alert-delete").modal('hide');
                     },
@@ -180,11 +203,11 @@
         function submitFormFilter() {
             $('#form-filter').on('submit', function (e) {
                 e.preventDefault();
-                $('.card-body').load(location.href + " .card-body");
-                $('.card-footer').load(location.href + " .card-footer");
+                $('#crawl-data').load(location.href + " #crawl-data");
                 crawlData();
             });
         }
+
 
         $(document).ready(function () {
             crawlData();

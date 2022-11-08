@@ -21,7 +21,7 @@ function convertDateToDateTime(date) {
         m.getUTCFullYear();
 }
 
-function renderPagination(links,pageNow) {
+function renderPagination(links, pageNow) {
     links.forEach(function (each) {
         let disable = false;
         let page = each.label;
@@ -44,9 +44,8 @@ function renderPagination(links,pageNow) {
 }
 
 function changePage(page) {
-    let urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('page', page);
-    window.location.search = urlParams;
+    $('#crawl-data').load(location.href + " #crawl-data");
+    crawlData(page);
 }
 
 function formatToDate(date) {

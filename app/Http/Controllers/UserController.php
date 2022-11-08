@@ -37,17 +37,28 @@ class UserController extends Controller
     {
         try {
             $query = $this->model->clone();
-            if (!empty($request->username)) {
-                $query->where('username', $request->username);
+            if (!empty($request->deleted_type)) {
+                if ($request->deleted_type === 'All') {
+
+                    $query->withTrashed();
+                }
+                if ($request->deleted_type === '1') {
+                    $query->onlyTrashed();
+                }
             }
-            if ($request->deleted_type === 0) {
-                $query->withTrashed();
-            }
-            if ($request->deleted_type === 1) {
-                $query->onlyTrashed();
+            if (!is_null($request->active)) {
+                if ($request->active === '1') {
+                    $query->where('active', '=', 1);
+                }
+                if ($request->active === '0') {
+                    $query->where('active', '=', 0);
+                }
             }
             if (auth()->user()->role === UserRoleEnum::USER) {
                 $query->where('role', UserRoleEnum::USER);
+            }
+            if (!empty($request->username)) {
+                $query->where('username', $request->username);
             }
             $collection         = $query->latest()->paginate();
             $data['data']       = $collection->getCollection();
