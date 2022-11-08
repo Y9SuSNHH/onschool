@@ -109,7 +109,9 @@
                     type: type,
                     dataType: 'JSON',
                     data: formData,
-                    headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+                    headers: {
+                        'X-CSRF-TOKEN': $("input[name=_token]").val(),
+                        Authorization: `${getJWT().token_type} ` + getJWT().access_token},
                     processData: false,
                     contentType: false,
                     success: function (response) {

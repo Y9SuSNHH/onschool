@@ -6,20 +6,21 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col-lg-6">
-                            {{--                            <form class="form-inline">--}}
-                            {{--                                <div class="form-group mb-2">--}}
-                            {{--                                    <label for="inputPassword2" class="sr-only">Search</label>--}}
-                            {{--                                    <input type="search" class="form-control" id="inputPassword2"--}}
-                            {{--                                           placeholder="Search...">--}}
-                            {{--                                </div>--}}
-                            {{--                                <div class="form-group mx-sm-3 mb-2">--}}
-                            {{--                                    <select class="custom-select" id="status-select">--}}
-                            {{--                                        <option>Without deleted records</option>--}}
-                            {{--                                        <option value="0">With deleted records</option>--}}
-                            {{--                                        <option value="1">Only deleted records</option>--}}
-                            {{--                                    </select>--}}
-                            {{--                                </div>--}}
-                            {{--                            </form>--}}
+                            <form class="form-inline" id="form-filter">
+                                <div class="form-group mb-2">
+                                    <label for="username" class="sr-only">Search</label>
+                                    <input type="search" class="form-control filter-change" id="filter-username"
+                                           name="username" placeholder="Search...">
+                                </div>
+                                <div class="form-group mx-sm-3 mb-2">
+                                    <select class="custom-select filter-change" name="deleted_type"
+                                            id="filter-deleted-type">
+                                        <option value="0" selected>Without deleted records</option>
+                                        <option value="All">With deleted records</option>
+                                        <option value="1">Only deleted records</option>
+                                    </select>
+                                </div>
+                            </form>
                         </div>
                         <div class="col-lg-6">
                             <div class="text-lg-right">
@@ -83,12 +84,15 @@
         }
 
         function crawlData() {
-            $('#card').load(location.href + " #card");
             $.ajax({
                 url: `{{route("api.$role.$table.list")}}`,
                 type: 'GET',
                 dataType: 'JSON',
-                data: {page: {{ request()->get('page') ?? 1 }}},
+                data: {
+                    page: {{ request()->get('page') ?? 1 }},
+                    username: $("input[name=username]").val(),
+                    deleted_type: $("select[name=deleted_type]").val(),
+                },
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
                 success: function (response) {
                     response.data.data.forEach(function (each) {
@@ -130,11 +134,16 @@
                     type: type,
                     dataType: 'JSON',
                     data: formData,
-                    headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+                    headers: {
+                        'X-CSRF-TOKEN': $("input[name=_token]").val(),
+                        Authorization: `${getJWT().token_type} ` + getJWT().access_token
+                    },
                     processData: false,
                     contentType: false,
                     success: function (response) {
                         notifySuccess(response.message);
+                        $('.card-body').load(location.href + " .card-body");
+                        $('.card-footer').load(location.href + " .card-footer");
                         crawlData();
                         $("#warning-alert-delete").modal('hide');
                     },
@@ -161,9 +170,26 @@
             });
         }
 
+        function filter() {
+            $(".filter-change").on('change', function () {
+                $("#form-filter").submit();
+            });
+            submitFormFilter();
+        }
+
+        function submitFormFilter() {
+            $('#form-filter').on('submit', function (e) {
+                e.preventDefault();
+                $('.card-body').load(location.href + " .card-body");
+                $('.card-footer').load(location.href + " .card-footer");
+                crawlData();
+            });
+        }
+
         $(document).ready(function () {
             crawlData();
             submitForm($("#form-delete"), "DELETE");
+            filter();
         });
     </script>
 @endpush

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use Throwable;
+use function PHPUnit\Framework\isNull;
 
 class UserController extends Controller
 {
@@ -32,10 +33,19 @@ class UserController extends Controller
 //        View::share('role', $this->role);
     }
 
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
         try {
             $query = $this->model->clone();
+            if (!empty($request->username)) {
+                $query->where('username', $request->username);
+            }
+            if ($request->deleted_type === 0) {
+                $query->withTrashed();
+            }
+            if ($request->deleted_type === 1) {
+                $query->onlyTrashed();
+            }
             if (auth()->user()->role === UserRoleEnum::USER) {
                 $query->where('role', UserRoleEnum::USER);
             }
@@ -119,7 +129,7 @@ class UserController extends Controller
     {
         DB::beginTransaction();
         try {
-            $user = $this->model->where('id', $id)->firstOrFail();
+            $user             = $this->model->where('id', $id)->firstOrFail();
             $user->deleted_by = auth()->user()->id;
             $user->delete();
             DB::commit();
