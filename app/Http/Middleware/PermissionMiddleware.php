@@ -23,7 +23,7 @@ class PermissionMiddleware
     public function handle(Request $request, Closure $next)
     {
         if (auth()->user()->active === 0) {
-            return $this->errorResponse('Your account is disabled');
+            return $this->errorResponse('Unauthorized action');
         }
         $role   = auth()->user()->role;
         $as     = explode('.', $this->route->getAction()['as']);
