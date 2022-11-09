@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\HomePageController;
+use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,7 @@ Route::group(
     ], static function () {
     Route::get('login', [AuthController::class, 'login'])->name('login');
     Route::get('/', [HomePageController::class, 'index'])->name('index');
+    Route::get('logs', [LogController::class, 'index'])->name('logs.index');
     Route::group(
         [
             'prefix' => 'users',

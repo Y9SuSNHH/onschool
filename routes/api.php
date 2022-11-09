@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\JwtController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -36,6 +37,7 @@ Route::group([
             'prefix' => 'admin',
             'as'     => 'admin.'
         ], static function () {
+        Route::get('logs', [LogController::class, 'list'])->name('logs.list');
         Route::group(
             [
                 'prefix' => 'users',

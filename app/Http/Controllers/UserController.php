@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Throwable;
 use function PHPUnit\Framework\isNull;
@@ -58,7 +59,8 @@ class UserController extends Controller
             $data['pagination'] = $collection->linkCollection();
             return $this->successResponse($data);
         } catch (Throwable $e) {
-            return $this->errorResponse($e);
+            Log::warning($e->getMessage());
+            return $this->errorResponse($e->getMessage());
         }
     }
 
@@ -79,9 +81,11 @@ class UserController extends Controller
                 'created_by' => auth()->user()->id,
             ]);
             DB::commit();
+            Log::info('Successfully created user.');
             return $this->successResponse([], 'Create user');
         } catch (Throwable $e) {
             DB::rollBack();
+            Log::warning($e->getMessage());
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -94,9 +98,11 @@ class UserController extends Controller
             $user->active = !$user->active;
             $user->save();
             DB::commit();
+            Log::info('Successfully updated active user account');
             return $this->successResponse([], 'Updated active');
         } catch (Throwable $e) {
             DB::rollBack();
+            Log::warning($e->getMessage());
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -107,6 +113,7 @@ class UserController extends Controller
             $data = $this->model->find($id);
             return $this->successResponse($data);
         } catch (Throwable $e) {
+            Log::warning($e->getMessage());
             return $this->errorResponse($e);
         }
     }
@@ -120,9 +127,11 @@ class UserController extends Controller
             $user->updated_by = auth()->user()->id;
             $user->save();
             DB::commit();
+            Log::info('Successfully updated user');
             return $this->successResponse([], 'Edit user');
         } catch (Throwable $e) {
             DB::rollBack();
+            Log::warning($e->getMessage());
             return $this->errorResponse($e);
         }
     }
@@ -135,9 +144,11 @@ class UserController extends Controller
             $user->deleted_by = auth()->user()->id;
             $user->delete();
             DB::commit();
+            Log::info('Successfully add user to trash');
             return $this->successResponse([], 'Delete user');
         } catch (Throwable $e) {
             DB::rollBack();
+            Log::warning($e->getMessage());
             return $this->errorResponse($e->getMessage());
         }
     }

@@ -41,6 +41,13 @@
                                         <span>Students</span>
                                     </a>
                                 </li>
+                                <li class="side-nav-item">
+                                    <a href="{{ route("admin.logs.index") }}" class="side-nav-link">
+                                        <i class="mdi mdi-file-table-outline"></i>
+                                        <span class="badge badge-info badge-pill float-right"></span>
+                                        <span>Logs</span>
+                                    </a>
+                                </li>
                             </ul>
                             <div class="clearfix"></div>
                         </div>

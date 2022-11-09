@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class StudentController extends Controller
@@ -34,6 +35,7 @@ class StudentController extends Controller
             $data['pagination'] = $query->linkCollection();
             return $this->successResponse($data);
         } catch (Throwable $e) {
+            Log::warning($e->getMessage());
             return $this->errorResponse($e);
         }
     }
@@ -44,6 +46,7 @@ class StudentController extends Controller
             $data = $this->model->find($id);
             return $this->successResponse($data);
         } catch (Throwable $e) {
+            Log::warning($e->getMessage());
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -59,9 +62,11 @@ class StudentController extends Controller
             $data = Arr::add($data, 'created_by', auth()->user()->id);
             $this->model->create(Arr::except($data, 'confirm_password'));
             DB::commit();
+            Log::info('Successfully created student.');
             return $this->successResponse([], 'Create student');
         } catch (Throwable $e) {
             DB::rollBack();
+            Log::warning($e->getMessage());
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -75,9 +80,11 @@ class StudentController extends Controller
             $user->updated_by = auth()->user()->id;
             $user->save();
             DB::commit();
+            Log::info('Successfully updated student.');
             return $this->successResponse([], 'Edit student');
         } catch (Throwable $e) {
             DB::rollBack();
+            Log::warning($e->getMessage());
             return $this->errorResponse($e);
         }
     }
@@ -91,9 +98,11 @@ class StudentController extends Controller
             $student->deleted_by = auth()->user()->id;
             $student->delete();
             DB::commit();
+            Log::info('Successfully add student to trash');
             return $this->successResponse([], 'Delete student');
         } catch (Throwable $e) {
             DB::rollBack();
+            Log::warning($e->getMessage());
             return $this->errorResponse($e->getMessage());
         }
     }
