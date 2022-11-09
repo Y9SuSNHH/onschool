@@ -120,6 +120,7 @@
                 contentType: false,
                 success: function (response) {
                     setJwtLocalStorage(response.data);
+                    {{--console.log(`{{route('api.auth.payload')}}`)--}}
                     let route = `{{route('admin.index')}}`;
                     window.location.href = `${route}`;
                 },
@@ -131,6 +132,7 @@
     }
 
     $(document).ready(function () {
+        setJwtPayloadLocalStorage(`{{route('api.auth.payload')}}`)
         submitForm($("#form-login"), "POST");
     });
 </script>

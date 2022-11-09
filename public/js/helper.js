@@ -12,13 +12,23 @@ function getJWT() {
     return JSON.parse(stringJWT);
 }
 
-function convertDateToDateTime(date) {
-    let m = new Date(date);
-    return ("0" + m.getUTCHours()).slice(-2) + ":" +
-        ("0" + m.getUTCMinutes()).slice(-2) + " | " +
-        ("0" + m.getUTCDate()).slice(-2) + "/" +
-        ("0" + (m.getUTCMonth() + 1)).slice(-2) + "/" +
-        m.getUTCFullYear();
+function setJwtPayloadLocalStorage(route) {
+    $.ajax({
+        url: route,
+        type: 'POST',
+        dataType: 'JSON',
+        headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+        success: function (response) {
+            localStorage.setItem('payloadJwt', JSON.stringify(response.data));
+        },
+        error: function (response) {
+        },
+    });
+}
+
+function getJwtPayloadLocalStorage() {
+    let stringJWT = localStorage.getItem('payloadJwt');
+    return JSON.parse(stringJWT);
 }
 
 function renderPagination(links, pageNow) {

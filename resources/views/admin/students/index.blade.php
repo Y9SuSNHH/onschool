@@ -83,7 +83,7 @@
                         <form method="POST" id="form-delete">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-warning my-2">DELETE</button>
+                            <button type="submit" class="btn btn-warning my-2 check-permission">DELETE</button>
                         </form>
                     </div>
                 </div>
@@ -116,7 +116,7 @@
                         let user = each.username + `<br><a href="#">Forgotten password?</a>`;
                         let edit_route = `{{ route("$role.$table.edit")}}/` + each.id;
                         let edit = `<a href="${edit_route}" class="action-icon"><i class="mdi mdi-pencil"></i></a>`;
-                        let destroy = `<a class="action-icon" data-toggle="modal" data-target="#warning-alert-delete" onclick="createActionFormDelete(${each.id})"><i class="mdi mdi-delete"></i></a>`;
+                        let destroy = `<a class="action-icon check-permission" data-toggle="modal" data-target="#warning-alert-delete" onclick="createActionFormDelete(${each.id})"><i class="mdi mdi-delete"></i></a>`;
                         let action = edit + destroy;
                         let created_by = `<a href="{{route("$role.$table.show")}}/${each.created_by.id}">${each.created_by.username}</a>` +
                             `<br>${each.created_by.role === 1 ? 'ADMIN' : 'USER'}`;
@@ -129,6 +129,10 @@
                             .append($('<td>').append(created_by))
                             .append($('<td class="table-action">').append(action))
                         );
+                        let payloadJwt = getJwtPayloadLocalStorage();
+                        if(payloadJwt.role === 2){
+                            $(".check-permission").prop('disabled',true);
+                        }
                     });
                     renderPagination(response.data.pagination, page);
                 },

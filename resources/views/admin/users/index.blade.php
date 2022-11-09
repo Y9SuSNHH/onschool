@@ -92,7 +92,7 @@
                         <form method="POST" id="form-delete">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-warning my-2">DELETE</button>
+                            <button type="submit" class="btn btn-warning my-2 check-permission">DELETE</button>
                         </form>
                     </div>
                 </div>
@@ -127,11 +127,11 @@
                         let information = each.firstname + `.${each.lastname} - ` + gender + `<br>` + phone + `<br>` + email;
                         let role = each.role === {{\App\Enums\UserRoleEnum::ADMIN}} ? 'ADMIN' : 'USER';
                         let user = each.username + ' - ' + role + `<br><a href="#">Forgotten password?</a>`;
-                        let active = `<input type="checkbox" id="active-${each.id}" ${each.active ? 'checked' : ''}  data-switch="success" onclick="userUpdateActive(${each.id})"/>
+                        let active = `<input type="checkbox" class="check-permission" id="active-${each.id}" ${each.active ? 'checked' : ''}  data-switch="success" onclick="userUpdateActive(${each.id})"/>
                         <label for="active-${each.id}" data-on-label="Yes" data-off-label="No" class="mb-0 d-block"></label>`;
                         let edit_route = `{{ route("$role.$table.edit")}}/` + each.id;
                         let edit = `<a href="${edit_route}" class="action-icon"><i class="mdi mdi-pencil"></i></a>`;
-                        let destroy = `<a class="action-icon" data-toggle="modal" data-target="#warning-alert-delete" onclick="createActionFormDelete(${each.id})"><i class="mdi mdi-delete"></i></a>`;
+                        let destroy = `<a class="action-icon check-permission" data-toggle="modal" data-target="#warning-alert-delete" onclick="createActionFormDelete(${each.id})"><i class="mdi mdi-delete"></i></a>`;
                         let action = edit + destroy;
                         $('#table-list').append($('<tr>')
                             .append($('<td>').append(each.id))
@@ -141,6 +141,10 @@
                             .append($('<td class="table-action">').append(action))
                         );
                     });
+                    let payloadJwt = getJwtPayloadLocalStorage();
+                    if(payloadJwt.role === 2){
+                        $(".check-permission").prop('disabled',true);
+                    }
                     renderPagination(response.data.pagination, page);
                 },
                 error: function (response) {
