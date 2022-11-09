@@ -52,6 +52,7 @@
                                                 <th>Identification</th>
                                                 <th>Contact</th>
                                                 <th>User</th>
+                                                <th>Created by</th>
                                                 <th>Action</th>
                                             </tr>
                                             </thead>
@@ -117,12 +118,15 @@
                         let edit = `<a href="${edit_route}" class="action-icon"><i class="mdi mdi-pencil"></i></a>`;
                         let destroy = `<a class="action-icon" data-toggle="modal" data-target="#warning-alert-delete" onclick="createActionFormDelete(${each.id})"><i class="mdi mdi-delete"></i></a>`;
                         let action = edit + destroy;
+                        let created_by = `<a href="{{route("$role.$table.show")}}/${each.created_by.id}">${each.created_by.username}</a>` +
+                            `<br>${each.created_by.role === 1 ? 'ADMIN' : 'USER'}`;
                         $('#table-list').append($('<tr>')
                             .append($('<td>').append(each.id))
                             .append($('<td>').append(information))
                             .append($('<td>').append(each.identification))
                             .append($('<td>').append(contact))
                             .append($('<td>').append(user))
+                            .append($('<td>').append(created_by))
                             .append($('<td class="table-action">').append(action))
                         );
                     });

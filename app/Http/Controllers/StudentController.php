@@ -27,9 +27,7 @@ class StudentController extends Controller
     {
         try {
             $query = $this->model->clone()
-                ->with(['user' => function ($query) {
-                    $query->select('username', 'role');
-                }])
+                ->with('created_by:id,username,role')
                 ->latest()->paginate();
 
             $data['data']       = $query->getCollection();

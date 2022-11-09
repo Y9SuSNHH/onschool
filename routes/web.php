@@ -40,6 +40,7 @@ Route::group(
         ], static function () {
         Route::get('/', [StudentController::class, 'index'])->name('index');
         Route::get('create', [StudentController::class, 'create'])->name('create');
+        Route::get('show', [StudentController::class, 'show'])->name('show');
         Route::get('edit/{id?}', [StudentController::class, 'edit'])->name('edit');
     });
 });

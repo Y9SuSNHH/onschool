@@ -29,8 +29,18 @@ class Student extends Model
         'password', 'remember_token',
     ];
 
-    public function user(): BelongsTo
+    public function created_by(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by')->withTrashed();
+    }
+
+    public function updated_by(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by')->withTrashed();
+    }
+
+    public function deleted_by(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'deleted_by')->withTrashed();
     }
 }
