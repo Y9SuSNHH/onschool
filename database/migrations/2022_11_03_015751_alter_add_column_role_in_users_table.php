@@ -13,8 +13,8 @@ class AlterAddColumnRoleInUsersTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('admin', 'role')) {
-            Schema::table('admin', static function (Blueprint $table) {
+        if (!Schema::hasColumn('users', 'role')) {
+            Schema::table('users', static function (Blueprint $table) {
                 $table->tinyInteger('role')->default(0);
             });
         }
