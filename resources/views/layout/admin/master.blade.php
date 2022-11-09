@@ -182,6 +182,8 @@
                 contentType: false,
                 success: function (response) {
                     notifySuccess(response.message);
+                    localStorage.removeItem('Jwt');
+                    localStorage.removeItem('payloadJwt');
                     let route_login = `{{route('admin.login')}}`
                     window.location.href = `${route_login}`;
                 },
