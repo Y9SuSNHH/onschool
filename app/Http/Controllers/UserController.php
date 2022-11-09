@@ -20,17 +20,10 @@ class UserController extends Controller
     use ResponseTrait;
 
     private object $model;
-//    private string $table;
-//    private string $role = 'admin';
 
     public function __construct()
     {
         $this->model = User::query();
-//        $this->table = (new User())->getTable();
-//
-//        View::share('title', ucfirst('Quản lý người dùng'));
-//        View::share('table', $this->table);
-//        View::share('role', $this->role);
     }
 
     public function list(Request $request): JsonResponse
@@ -74,8 +67,6 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $password = Hash::make($request->password);
-
-//            dd(1 === true);
             $this->model->create([
                 'username'   => $request->username,
                 'firstname'  => $request->firstname,
