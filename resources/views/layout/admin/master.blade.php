@@ -168,6 +168,7 @@
 <script src="{{asset('js/app.min.js')}}"></script>
 <script src="{{asset('js/helper.js')}}"></script>
 <script type="text/javascript">
+
     function submitFormLogout(form, type) {
         form.on('submit', function (event) {
             event.preventDefault();
@@ -182,8 +183,7 @@
                 contentType: false,
                 success: function (response) {
                     notifySuccess(response.message);
-                    localStorage.removeItem('Jwt');
-                    localStorage.removeItem('payloadJwt');
+                    localStorage.clear();
                     let route_login = `{{route('admin.login')}}`
                     window.location.href = `${route_login}`;
                 },
@@ -195,6 +195,7 @@
     }
 
     $(document).ready(function () {
+        checkJwt(`{{route('admin.login')}}`);
         submitFormLogout($("#form-logout"), "POST");
     });
 </script>

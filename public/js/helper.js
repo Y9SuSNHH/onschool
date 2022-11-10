@@ -1,3 +1,9 @@
+function checkJwt(route) {
+    if(localStorage.getItem('Jwt') === null){
+        window.location.href = `${route}`;
+    }
+}
+
 function setJwtLocalStorage(data) {
     let JWT = {
         access_token: data.access_token,
