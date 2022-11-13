@@ -14,7 +14,7 @@
                     <div id="div-error" class="alert alert-danger d-none"></div>
                     <div class="tab-content">
                         <div class="tab-pane show active" id="input-types-preview">
-                            <form action="{{route("api.$role.$table.store")}}" method="POST" id="form-create">
+                            <form action="{{route("api.$table.store")}}" method="POST" id="form-create">
                                 @csrf
                                 <div class="form-row">
                                     <div class="form-group col-md-3">

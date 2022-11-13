@@ -32,34 +32,28 @@ Route::group([
         Route::post('payload', [JwtController::class, 'payload'])->name('payload');
         Route::post('logout', [JwtController::class, 'logout'])->name('logout');
     });
+    Route::get('logs', [LogController::class, 'list'])->name('logs.list');
     Route::group(
         [
-            'prefix' => 'admin',
-            'as'     => 'admin.'
+            'prefix' => 'users',
+            'as'     => 'users.'
         ], static function () {
-        Route::get('logs', [LogController::class, 'list'])->name('logs.list');
-        Route::group(
-            [
-                'prefix' => 'users',
-                'as'     => 'users.'
-            ], static function () {
-            Route::get('list', [UserController::class, 'list'])->name('list');
-            Route::post('create', [UserController::class, 'store'])->name('store');
-            Route::get('/{id?}', [UserController::class, 'show'])->name('show');
-            Route::get('update-active/{id?}', [UserController::class, 'updateActive'])->name('update.active');
-            Route::put('edit/{id?}', [UserController::class, 'update'])->name('update');
-            Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy');
-        });
-        Route::group(
-            [
-                'prefix' => 'students',
-                'as'     => 'students.'
-            ], static function () {
-            Route::get('list', [StudentController::class, 'list'])->name('list');
-            Route::post('create', [StudentController::class, 'store'])->name('store');
-            Route::get('/{id?}', [StudentController::class, 'show'])->name('show');
-            Route::put('edit/{id?}', [StudentController::class, 'update'])->name('update');
-            Route::delete('/{id?}', [StudentController::class, 'destroy'])->name('destroy');
-        });
+        Route::get('list', [UserController::class, 'list'])->name('list');
+        Route::post('create', [UserController::class, 'store'])->name('store');
+        Route::get('/{id?}', [UserController::class, 'show'])->name('show');
+//        Route::get('update-active/{id?}', [UserController::class, 'updateActive'])->name('update.active');
+        Route::put('edit/{id?}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy');
+    });
+    Route::group(
+        [
+            'prefix' => 'students',
+            'as'     => 'students.'
+        ], static function () {
+        Route::get('list', [StudentController::class, 'list'])->name('list');
+        Route::post('create', [StudentController::class, 'store'])->name('store');
+        Route::get('/{id?}', [StudentController::class, 'show'])->name('show');
+        Route::put('edit/{id?}', [StudentController::class, 'update'])->name('update');
+        Route::delete('/{id?}', [StudentController::class, 'destroy'])->name('destroy');
     });
 });

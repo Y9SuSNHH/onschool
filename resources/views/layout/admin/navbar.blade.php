@@ -119,7 +119,7 @@
                 <!-- item-->
                 <a href="javascript:void(0);" class="dropdown-item notify-item">
                     <div class="media">
-                        <img class="d-flex mr-2 rounded-circle" src="assets/images/users/avatar-2.jpg"
+                        <img class="d-flex mr-2 rounded-circle" src=""
                              alt="Generic placeholder image" height="32">
                         <div class="media-body">
                             <h5 class="m-0 font-14">Erwin Brown</h5>
@@ -131,7 +131,7 @@
                 <!-- item-->
                 <a href="javascript:void(0);" class="dropdown-item notify-item">
                     <div class="media">
-                        <img class="d-flex mr-2 rounded-circle" src="assets/images/users/avatar-5.jpg"
+                        <img class="d-flex mr-2 rounded-circle" src=""
                              alt="Generic placeholder image" height="32">
                         <div class="media-body">
                             <h5 class="m-0 font-14">Jacob Deo</h5>

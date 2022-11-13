@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserActiveEnum;
 use App\Enums\UserRoleEnum;
 use App\Http\Requests\Admin\UserStoreRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
@@ -14,49 +15,37 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Throwable;
-use function PHPUnit\Framework\isNull;
 
 class UserController extends Controller
 {
     use ResponseTrait;
 
     private object $model;
+    private object $users;
 
     public function __construct()
     {
+        $this->users = new User();
         $this->model = User::query();
     }
 
     public function list(Request $request): JsonResponse
+
     {
         try {
-            $query = $this->model->clone();
-            if (!empty($request->deleted_type)) {
-                if ($request->deleted_type === 'All') {
+            $table_length = 15;
+            if ($request->has('table_length')) {
+                $table_length = $request->get('table_length');
+            }
 
-                    $query->withTrashed();
-                }
-                if ($request->deleted_type === '1') {
-                    $query->onlyTrashed();
-                }
-            }
-            if (!is_null($request->active)) {
-                if ($request->active === '1') {
-                    $query->where('active', '=', 1);
-                }
-                if ($request->active === '0') {
-                    $query->where('active', '=', 0);
-                }
-            }
-            if (auth()->user()->role === UserRoleEnum::USER) {
-                $query->where('role', UserRoleEnum::USER);
-            }
-            if (!empty($request->username)) {
-                $query->where('username', $request->username);
-            }
-            $collection         = $query->latest()->paginate();
-            $data['data']       = $collection->getCollection();
-            $data['pagination'] = $collection->linkCollection();
+            $filter = $this->users->handleFilter($request);
+            $list   = $this->users->list($filter)->paginate($table_length);
+
+            $data['data']      = $list->getCollection();
+            $data['total']     = $list->total();
+            $data['last_page'] = $list->lastPage();
+            $data['per_page']  = $list->perPage();
+
             return $this->successResponse($data);
         } catch (Throwable $e) {
             Log::warning($e->getMessage());
@@ -90,23 +79,6 @@ class UserController extends Controller
         }
     }
 
-    public function updateActive($id): JsonResponse
-    {
-        DB::beginTransaction();
-        try {
-            $user         = $this->model->find($id);
-            $user->active = !$user->active;
-            $user->save();
-            DB::commit();
-            Log::info('Successfully updated active user account');
-            return $this->successResponse([], 'Updated active');
-        } catch (Throwable $e) {
-            DB::rollBack();
-            Log::warning($e->getMessage());
-            return $this->errorResponse($e->getMessage());
-        }
-    }
-
     public function show($id): JsonResponse
     {
         try {
@@ -114,7 +86,7 @@ class UserController extends Controller
             return $this->successResponse($data);
         } catch (Throwable $e) {
             Log::warning($e->getMessage());
-            return $this->errorResponse($e);
+            return $this->errorResponse($e->getMessage());
         }
     }
 
@@ -122,7 +94,11 @@ class UserController extends Controller
     {
         DB::beginTransaction();
         try {
-            $user = $this->model->find($userId);
+            $key = $this->users->validateRequired($request->all());
+            if ($key !== true) {
+                return $this->errorResponse('The ' . $key . ' field is required.');
+            }
+            $user = $this->users->checkFind($userId);
             $user->fill($request->validated());
             $user->updated_by = auth()->user()->id;
             $user->save();
@@ -132,7 +108,7 @@ class UserController extends Controller
         } catch (Throwable $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
-            return $this->errorResponse($e);
+            return $this->errorResponse($e->getMessage());
         }
     }
 
@@ -140,8 +116,10 @@ class UserController extends Controller
     {
         DB::beginTransaction();
         try {
-            $user             = $this->model->where('id', $id)->firstOrFail();
+            $user = $this->users->checkFind($id);
+
             $user->deleted_by = auth()->user()->id;
+            $user->save();
             $user->delete();
             DB::commit();
             Log::info('Successfully add user to trash');

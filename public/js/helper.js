@@ -1,6 +1,28 @@
-function checkJwt(route) {
-    if(localStorage.getItem('Jwt') === null){
-        window.location.href = `${route}`;
+function checkJwt(login, profile) {
+    let valueJwt = getJWT();
+    if (valueJwt === null || valueJwt === '' || valueJwt === undefined) {
+        window.location.href = `${login}`;
+        try {
+            JSON.parse(valueJwt);
+        } catch (e) {
+            window.location.href = `${login}`;
+        }
+    } else {
+        $.ajax({
+            url: `${profile}`,
+            type: 'POST',
+            dataType: 'JSON',
+            headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+            processData: false,
+            contentType: false,
+            success: function (response) {
+            },
+            error: function (response) {
+                if (response.status === 401) {
+                    window.location.href = `${login}`;
+                }
+            },
+        });
     }
 }
 
@@ -14,8 +36,12 @@ function setJwtLocalStorage(data) {
 }
 
 function getJWT() {
-    let stringJWT = localStorage.getItem('Jwt');
-    return JSON.parse(stringJWT);
+    let valueJwt = localStorage.getItem('Jwt');
+    try {
+        return JSON.parse(valueJwt);
+    } catch (e) {
+        window.location.href = `http://localhost:8080/admin/login`;
+    }
 }
 
 function setJwtPayloadLocalStorage(route) {
@@ -23,7 +49,7 @@ function setJwtPayloadLocalStorage(route) {
         url: route,
         type: 'POST',
         dataType: 'JSON',
-        headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
+        headers: {Authorization: `${getJWT().token_type}` + getJWT().access_token},
         success: function (response) {
             localStorage.setItem('payloadJwt', JSON.stringify(response.data));
         },
@@ -37,32 +63,50 @@ function getJwtPayloadLocalStorage() {
     return JSON.parse(stringJWT);
 }
 
-function renderPagination(links, pageNow) {
-    links.forEach(function (each) {
-        let disable = false;
-        let page = each.label;
-        if (each.label === "&laquo; Previous") {
-            if (links[1].active === true) {
-                disable = true;
-            }
-            each.label = '&laquo;';
-            page = pageNow - 1;
-        } else if (each.label === "Next &raquo;") {
-            if (links[links.length - 2].active === true) {
-                disable = true;
-            }
-            each.label = '&raquo;';
-            page = pageNow + 1;
-        }
-        $('#pagination').append($('<li>').attr('class', `page-item ${each.active ? 'active' : ''} ${disable ? 'disabled' : ''}`)
-            .append(`<a class="page-link" onclick="changePage(${page})">${each.label}</a>`));
-    })
+function renderPagination(lastPage, pageNow) {
+    let string = "";
+    let previous = pageNow - 1;
+    if (pageNow === 1) {
+        previous = pageNow;
+    }
+    string += `<li class="page-item previous ${pageNow === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="javascript: void(0);" onclick="crawlData(${previous},false)"><i class="mdi mdi-chevron-left"></i></a>
+               </li>`;
+    for (let i = 1; i <= lastPage; i++) {
+        string += `<li class="page-item page-${i} ${pageNow === i ? 'active' : ''}">
+                    <a class="page-link" href="javascript: void(0);" onclick="crawlData(${i},false)">${i}</a>
+                    </li>`;
+    }
+    let next = pageNow + 1;
+    if (pageNow === lastPage) {
+        next = pageNow;
+    }
+    string += `<li class="page-item next ${pageNow === lastPage ? 'disabled' : ''}">
+                <a class="page-link" href="javascript: void(0);" onclick="crawlData(${next},false)"><i class="mdi mdi-chevron-right"></i></a>
+               </li>`;
+    $("#pagination").append(string);
 }
 
-function changePage(page) {
-    $('#crawl-data').load(location.href + " #crawl-data");
-    crawlData(page);
-}
+// function renderPagination(lastPage, pageNow) {
+//     let previous = pageNow - 1;
+//     if (pageNow === 1) {
+//         previous = pageNow;
+//     }
+//     $('#pagination').append($('<li>').attr('class', `page-item ${pageNow === 1 ? 'disabled' : ''} `)
+//         .append(`<a class="page-link" onclick="changePage(${previous})"><i class="mdi mdi-chevron-left"></i></a>`));
+//
+//     for (let i = 1; i <= lastPage; i++) {
+//         $('#pagination').append($('<li>').attr('class', `page-item ${pageNow === i ? 'active' : ''}`)
+//             .append(`<a class="page-link" onclick="changePage(${i})">${i}</a>`));
+//     }
+//
+//     let next = pageNow + 1;
+//     if (pageNow === lastPage) {
+//         next = pageNow;
+//     }
+//     $('#pagination').append($('<li>').attr('class', `page-item ${pageNow === lastPage ? 'disabled' : ''}`)
+//         .append(`<a class="page-link" onclick="changePage(${next})"><i class="mdi mdi-chevron-right"></i></a>`));
+// }
 
 function formatToDate(date) {
     const format = new Date(date);

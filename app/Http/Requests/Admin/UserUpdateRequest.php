@@ -28,29 +28,26 @@ class UserUpdateRequest extends FormRequest
     {
         return [
             'firstname' => [
-                'required',
                 'string',
             ],
             'lastname'  => [
-                'required',
                 'string',
             ],
             'gender'    => [
-                'required',
                 'boolean',
             ],
             'phone'     => [
-                'required',
                 'numeric',
                 'min:8',
                 Rule::unique(User::class, 'phone')->ignore($this->phone, 'phone'),
             ],
             'email'     => [
-                'required',
                 'email',
             ],
+            'active'     => [
+                'boolean',
+            ],
             'role'      => [
-                'required',
                 Rule::in(UserRoleEnum::getValues()),
             ],
         ];

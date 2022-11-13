@@ -33,7 +33,7 @@
     <script type="text/javascript">
         function crawlData() {
             $.ajax({
-                url: `{{route("api.$role.$table.list")}}`,
+                url: `{{route("api.$table.list")}}`,
                 type: 'GET',
                 dataType: 'JSON',
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},

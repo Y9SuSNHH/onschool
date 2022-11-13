@@ -94,12 +94,12 @@
 @push('js')
     <script type="text/javascript">
         function createActionFormDelete(id) {
-            $("#form-delete").attr('action', `{{route("api.$role.$table.destroy")}}/${id}`)
+            $("#form-delete").attr('action', `{{route("api.$table.destroy")}}/${id}`)
         }
 
-        function crawlData(page) {
+        function crawlData(page = 1, renderPage = true) {
             $.ajax({
-                url: `{{route("api.$role.$table.list")}}`,
+                url: `{{route("api.$table.list")}}`,
                 type: 'GET',
                 dataType: 'JSON',
                 data: {page},
@@ -134,7 +134,7 @@
                             $(".check-permission").prop('disabled',true);
                         }
                     });
-                    renderPagination(response.data.pagination, page);
+                    renderPagination(response.data.last_page, page);
                 },
                 error: function (response) {
                     notifyError(response.statusText);

@@ -27,33 +27,26 @@ class StudentUpdateRequest extends FormRequest
     {
         return [
             'firstname'        => [
-                'required',
                 'string',
             ],
             'lastname'         => [
-                'required',
                 'string',
             ],
             'gender'           => [
-                'required',
                 'boolean',
             ],
             'phone'            => [
-                'required',
                 'numeric',
                 'min:8',
                 Rule::unique(Student::class, 'phone')->ignore($this->phone, 'phone'),
             ],
             'address'          => [
-                'required',
                 'string',
             ],
             'identification'   => [
-                'required',
                 'string',
             ],
             'email'            => [
-                'required',
                 'email',
             ],
         ];

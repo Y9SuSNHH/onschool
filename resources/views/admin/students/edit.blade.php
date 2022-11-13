@@ -99,13 +99,13 @@
             const arrUrlEdit = urlEdit.split("/");
             const id = arrUrlEdit[6];
             $.ajax({
-                url: `{{route("api.$role.$table.show")}}/${id}`,
+                url: `{{route("api.$table.show")}}/${id}`,
                 type: 'GET',
                 dataType: 'JSON',
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
                 success: function (response) {
                     let each = response.data;
-                    let action = `{{route("api.$role.$table.update")}}/${id}`;
+                    let action = `{{route("api.$table.update")}}/${id}`;
                     $("#form-edit").attr('action', action);
                     $("#username").html(each.username);
                     $("input[name=firstname]").val(each.firstname);
@@ -125,15 +125,12 @@
         }
 
         function submitForm(form, type) {
-            const formData = new FormData(form[0]);
             $.ajax({
                 url: form.attr('action'),
                 type: type,
                 dataType: 'JSON',
-                data: formData,
+                data: form.serialize(),
                 headers: {Authorization: `${getJWT().token_type} ` + getJWT().access_token},
-                processData: false,
-                contentType: false,
                 success: function (response) {
                     console.log(response);
                     $("#div-error").addClass("d-none")
@@ -185,7 +182,7 @@
                 },
                 submitHandler: function (form, event) {
                     event.preventDefault();
-                    submitForm($("#form-edit"), "POST");
+                    submitForm($("#form-edit"), "PUT");
                 },
             });
         }

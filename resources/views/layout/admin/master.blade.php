@@ -195,7 +195,7 @@
     }
 
     $(document).ready(function () {
-        checkJwt(`{{route('admin.login')}}`);
+        checkJwt(`{{route('admin.login')}}`,`{{route('api.auth.profile')}}`);
         submitFormLogout($("#form-logout"), "POST");
     });
 </script>

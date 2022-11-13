@@ -18,25 +18,32 @@ class StudentController extends Controller
     use ResponseTrait;
 
     private object $model;
+    private object $students;
 
     public function __construct()
     {
-        $this->model = Student::query();
+        $this->students = new Student();
+        $this->model    = Student::query();
     }
 
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
         try {
-            $query = $this->model->clone()
-                ->with('created_by:id,username,role')
-                ->latest()->paginate();
+            $table_length = 5;
+            if ($request->has('table_length')) {
+                $table_length = $request->get('table_length');
+            }
 
-            $data['data']       = $query->getCollection();
-            $data['pagination'] = $query->linkCollection();
+//            $filter = $this->students->handleFilter($request);
+            $list = $this->students->list()->paginate($table_length);
+
+            $data['data']      = $list->getCollection();
+            $data['total']     = $list->total();
+            $data['last_page'] = $list->lastPage();
             return $this->successResponse($data);
         } catch (Throwable $e) {
             Log::warning($e->getMessage());
-            return $this->errorResponse($e);
+            return $this->errorResponse($e->getMessage());
         }
     }
 
@@ -75,7 +82,11 @@ class StudentController extends Controller
     {
         DB::beginTransaction();
         try {
-            $user = $this->model->find($userId);
+            $key = $this->students->validateRequired($request->all());
+            if ($key !== true) {
+                return $this->errorResponse('The ' . $key . ' field is required.');
+            }
+            $user = $this->students->checkFind($userId);
             $user->fill($request->validated());
             $user->updated_by = auth()->user()->id;
             $user->save();
@@ -85,7 +96,7 @@ class StudentController extends Controller
         } catch (Throwable $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
-            return $this->errorResponse($e);
+            return $this->errorResponse($e->getMessage());
         }
     }
 
@@ -93,9 +104,10 @@ class StudentController extends Controller
     {
         DB::beginTransaction();
         try {
-            $student = $this->model->where('id', $id)->firstOrFail();
+            $student = $this->students->checkFind($id);
 
             $student->deleted_by = auth()->user()->id;
+            $student->save();
             $student->delete();
             DB::commit();
             Log::info('Successfully add student to trash');
