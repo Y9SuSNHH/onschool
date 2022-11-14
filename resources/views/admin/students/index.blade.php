@@ -39,31 +39,37 @@
                             </div>
                         </div>
                     </div>
-                    <div id="crawl-data">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="tab-content">
-                                    <div class="table-responsive">
-                                        <table class="table mb-0" id="table-list">
-                                            <thead class="thead-dark">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Information</th>
-                                                <th>Identification</th>
-                                                <th>Contact</th>
-                                                <th>User</th>
-                                                <th>Created by</th>
-                                                <th>Action</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tab-content">
+                                <div class="table-responsive" id="crawl-data">
+                                    <table class="table mb-0" id="table-list">
+                                        <thead class="thead-dark">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Information</th>
+                                            <th>Identification</th>
+                                            <th>Contact</th>
+                                            <th>User</th>
+                                            <th>Created by</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-12">
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="dataTables_info" id="products-datatable_info" role="status"
+                                 aria-live="polite">
+                                <span id="info_table"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-7">
+                            <div class="dataTables_paginate paging_simple_numbers" id="products-datatable_paginate">
                                 <ul class="pagination pagination-rounded mb-0" id="pagination"></ul>
                             </div>
                         </div>
@@ -97,7 +103,10 @@
             $("#form-delete").attr('action', `{{route("api.$table.destroy")}}/${id}`)
         }
 
-        function crawlData(page = 1, renderPage = true) {
+        const freshDiv = async (div, fresh) => await div.load(location.href + ` ${fresh}`);
+
+        async function crawlData(page = 1, renderPage = true) {
+            await freshDiv($('#crawl-data'), '#table-list');
             $.ajax({
                 url: `{{route("api.$table.list")}}`,
                 type: 'GET',
@@ -118,8 +127,8 @@
                         let edit = `<a href="${edit_route}" class="action-icon"><i class="mdi mdi-pencil"></i></a>`;
                         let destroy = `<a class="action-icon check-permission" data-toggle="modal" data-target="#warning-alert-delete" onclick="createActionFormDelete(${each.id})"><i class="mdi mdi-delete"></i></a>`;
                         let action = edit + destroy;
-                        let created_by = `<a href="{{route("$role.$table.show")}}/${each.created_by.id}">${each.created_by.username}</a>` +
-                            `<br>${each.created_by.role === 1 ? 'ADMIN' : 'USER'}`;
+                        let created_by = `<a href="{{route("$role.$table.show")}}/${each.created_by}">${each.created_by_username}</a>` +
+                            `<br>${each.created_by_role === 1 ? 'ADMIN' : 'USER'}`;
                         $('#table-list').append($('<tr>')
                             .append($('<td>').append(each.id))
                             .append($('<td>').append(information))
@@ -130,9 +139,35 @@
                             .append($('<td class="table-action">').append(action))
                         );
                         let payloadJwt = getJwtPayloadLocalStorage();
-                        if(payloadJwt.role === 2){
-                            $(".check-permission").prop('disabled',true);
+                        if (payloadJwt.role === 2) {
+                            $(".check-permission").prop('disabled', true);
                         }
+                        let per_page = response.data.per_page;
+                        let from = (per_page * (page - 1)) + 1;
+                        let to = per_page * page;
+                        if (to > response.data.total) {
+                            to = response.data.last_page;
+                        }
+                        let info_table = 'Showing students ' + from + ' to ' + to + ' of ' + response.data.total;
+                        $("#info_table").text(info_table);
+                        if (renderPage === true) {
+                            freshDiv($('#products-datatable_paginate'), '#pagination');
+                            setTimeout(() => {
+                                renderPagination(response.data.last_page, page);
+                            }, 2000);
+                        }
+                        $(`.page-item`).removeClass('active');
+                        $(`.page-item`).removeClass('disabled');
+                        $('.previous > a').attr('onclick', `crawlData(${page - 1},${false})`);
+                        $('.next > a').attr('onclick', `crawlData(${page + 1},${false})`);
+                        if (page === 1) {
+                            $(`.previous`).addClass('disabled');
+                            $('.previous > a').attr('onclick', `crawlData(${page},${false})`);
+                        }
+                        if (page === response.data.last_page) {
+                            $(`.next`).addClass('disabled');
+                        }
+                        $(`.page-${page}`).addClass('active');
                     });
                     renderPagination(response.data.last_page, page);
                 },
@@ -159,7 +194,6 @@
                     contentType: false,
                     success: function (response) {
                         notifySuccess(response.message);
-                        $('#crawl-data').load(location.href + " #crawl-data");
                         crawlData();
                         $("#warning-alert-delete").modal('hide');
                     },

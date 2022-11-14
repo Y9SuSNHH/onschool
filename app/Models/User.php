@@ -101,15 +101,6 @@ class User extends Authenticatable implements JWTSubject
         return $filter;
     }
 
-    public function checkFind($id)
-    {
-        $user = self::query()->find($id);
-        if (!$user) {
-            return $this->errorResponse('This user does not exist');
-        }
-        return $user;
-    }
-
     public function validateRequired($request)
     {
         foreach ($request as $key => $value) {

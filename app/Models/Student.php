@@ -52,9 +52,9 @@ class Student extends Model
     public function list($filter = []): Builder
     {
         $query = DB::table($this->table)
+            ->select("$this->table.*", 'users.username as created_by_username', 'users.role as created_by_role')
             ->where("$this->table.deleted_at", '=', null)
             ->join('users', "$this->table.created_by", '=', 'users.id')
-            ->select("$this->table.*", 'users.id', 'users.username')
             ->orderByDesc("$this->table.id");
         if (!empty($filter)) {
             $query->where($filter);
@@ -70,14 +70,5 @@ class Student extends Model
             }
         }
         return true;
-    }
-
-    public function checkFind($id)
-    {
-        $user = self::query()->find($id);
-        if (!$user) {
-            return $this->errorResponse('This student does not exist');
-        }
-        return $user;
     }
 }

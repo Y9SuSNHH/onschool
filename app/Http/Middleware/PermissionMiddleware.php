@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Enums\UserRoleEnum;
 use App\Http\Controllers\ResponseTrait;
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -25,20 +26,35 @@ class PermissionMiddleware
         if (auth()->user()->active === 0) {
             return $this->errorResponse('Unauthorized action');
         }
-        $role   = auth()->user()->role;
+        $role = auth()->user()->role;
+        $id   = $this->route->id;
+        if (!is_numeric($id)) {
+            return $this->errorResponse('Incorrect id');
+        }
         $as     = explode('.', $this->route->getAction()['as']);
-        $method = $as[2];
+        $method = $as[1];
         foreach ($as as $i => $iValue) {
-            if ($i > 2) {
+            if ($i > 1) {
                 $method .= '.' . $iValue;
             }
         }
         if ($role === UserRoleEnum::USER) {
-            $permission = ['students.destroy', 'users.destroy', 'users.update.active'];
+            $permission = ['students.destroy', 'users.destroy'];
             foreach ($permission as $key => $value) {
                 if ($value === $method) {
                     return $this->errorResponse('Incorrect permission');
                 }
+            }
+            if ($method === 'users.update') {
+                $user = User::query()->find($id);
+                if (!$user) {
+                    return $this->errorResponse('This user does not exist');
+                }
+
+                if ($user->role !== $role) {
+                    return $this->errorResponse('Incorrect permission');
+                }
+                dd(2);
             }
         }
 

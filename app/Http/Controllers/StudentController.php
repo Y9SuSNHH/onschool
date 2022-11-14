@@ -40,6 +40,7 @@ class StudentController extends Controller
             $data['data']      = $list->getCollection();
             $data['total']     = $list->total();
             $data['last_page'] = $list->lastPage();
+            $data['per_page']  = $list->perPage();
             return $this->successResponse($data);
         } catch (Throwable $e) {
             Log::warning($e->getMessage());
@@ -86,10 +87,13 @@ class StudentController extends Controller
             if ($key !== true) {
                 return $this->errorResponse('The ' . $key . ' field is required.');
             }
-            $user = $this->students->checkFind($userId);
-            $user->fill($request->validated());
-            $user->updated_by = auth()->user()->id;
-            $user->save();
+            $students = $this->model->find($userId);
+            if (!$students) {
+                return $this->errorResponse('This user does not exist');
+            }
+            $students->fill($request->validated());
+            $students->updated_by = auth()->user()->id;
+            $students->save();
             DB::commit();
             Log::info('Successfully updated student.');
             return $this->successResponse([], 'Edit student');
@@ -104,8 +108,10 @@ class StudentController extends Controller
     {
         DB::beginTransaction();
         try {
-            $student = $this->students->checkFind($id);
-
+            $student = $this->model->find($id);
+            if (!$student) {
+                return $this->errorResponse('This user does not exist');
+            }
             $student->deleted_by = auth()->user()->id;
             $student->save();
             $student->delete();

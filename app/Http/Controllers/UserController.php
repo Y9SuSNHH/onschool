@@ -90,7 +90,7 @@ class UserController extends Controller
         }
     }
 
-    public function update(UserUpdateRequest $request, $userId): JsonResponse
+    public function update(UserUpdateRequest $request, $id): JsonResponse
     {
         DB::beginTransaction();
         try {
@@ -98,7 +98,7 @@ class UserController extends Controller
             if ($key !== true) {
                 return $this->errorResponse('The ' . $key . ' field is required.');
             }
-            $user = $this->users->checkFind($userId);
+            $user = $this->model->find($id);
             $user->fill($request->validated());
             $user->updated_by = auth()->user()->id;
             $user->save();
@@ -116,8 +116,10 @@ class UserController extends Controller
     {
         DB::beginTransaction();
         try {
-            $user = $this->users->checkFind($id);
-
+            $user = $this->model->find($id);
+            if (!$user) {
+                return $this->errorResponse('This user does not exist');
+            }
             $user->deleted_by = auth()->user()->id;
             $user->save();
             $user->delete();

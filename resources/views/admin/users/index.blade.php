@@ -122,7 +122,7 @@
                 headers: {
                     Authorization: `${getJWT().token_type} ` + getJWT().access_token
                 },
-                success: async function (response) {
+                success: function (response) {
                     response.data.data.forEach(function (each) {
                         let gender = each.gender ? 'Male' : 'Female';
                         let phone = `<a href="tel:${each.phone}">${each.phone}</a>`;
@@ -159,7 +159,7 @@
                     let info_table = 'Showing users ' + from + ' to ' + to + ' of ' + response.data.total;
                     $("#info_table").text(info_table);
                     if (renderPage === true) {
-                        await freshDiv($('#products-datatable_paginate'), '#pagination');
+                        freshDiv($('#products-datatable_paginate'), '#pagination');
                         setTimeout(() => {
                             renderPagination(response.data.last_page, page);
                         }, 2000);

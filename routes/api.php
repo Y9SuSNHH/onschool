@@ -41,7 +41,6 @@ Route::group([
         Route::get('list', [UserController::class, 'list'])->name('list');
         Route::post('create', [UserController::class, 'store'])->name('store');
         Route::get('/{id?}', [UserController::class, 'show'])->name('show');
-//        Route::get('update-active/{id?}', [UserController::class, 'updateActive'])->name('update.active');
         Route::put('edit/{id?}', [UserController::class, 'update'])->name('update');
         Route::delete('/{id?}', [UserController::class, 'destroy'])->name('destroy');
     });
