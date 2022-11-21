@@ -28,7 +28,7 @@ class PermissionMiddleware
         }
         $role = auth()->user()->role;
         $id   = $this->route->id;
-        if (!is_numeric($id)) {
+        if (!is_numeric($id) && !is_numeric($role)) {
             return $this->errorResponse('Incorrect id');
         }
         $as     = explode('.', $this->route->getAction()['as']);
@@ -54,10 +54,8 @@ class PermissionMiddleware
                 if ($user->role !== $role) {
                     return $this->errorResponse('Incorrect permission');
                 }
-                dd(2);
             }
         }
-
 
         return $next($request);
     }

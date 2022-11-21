@@ -37,6 +37,7 @@ class StudentController extends Controller
 //            $filter = $this->students->handleFilter($request);
             $list = $this->students->list()->paginate($table_length);
 
+//            dd($list);
             $data['data']      = $list->getCollection();
             $data['total']     = $list->total();
             $data['last_page'] = $list->lastPage();

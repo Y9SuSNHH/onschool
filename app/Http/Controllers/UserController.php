@@ -58,19 +58,8 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $password = Hash::make($request->password);
-            $this->model->create([
-                'username'   => $request->username,
-                'firstname'  => $request->firstname,
-                'lastname'   => $request->lastname,
-                'phone'      => $request->phone,
-                'gender'     => $request->gender,
-                'email'      => $request->email,
-                'password'   => $password,
-                'role'       => $request->role,
-                'created_by' => auth()->user()->id,
-            ]);
+            $this->model->create($request->validated());
             DB::commit();
-            Log::info('Successfully created user.');
             return $this->successResponse([], 'Create user');
         } catch (Throwable $e) {
             DB::rollBack();
@@ -100,10 +89,8 @@ class UserController extends Controller
             }
             $user = $this->model->find($id);
             $user->fill($request->validated());
-            $user->updated_by = auth()->user()->id;
             $user->save();
             DB::commit();
-            Log::info('Successfully updated user');
             return $this->successResponse([], 'Edit user');
         } catch (Throwable $e) {
             DB::rollBack();
@@ -120,11 +107,8 @@ class UserController extends Controller
             if (!$user) {
                 return $this->errorResponse('This user does not exist');
             }
-            $user->deleted_by = auth()->user()->id;
-            $user->save();
             $user->delete();
             DB::commit();
-            Log::info('Successfully add user to trash');
             return $this->successResponse([], 'Delete user');
         } catch (Throwable $e) {
             DB::rollBack();

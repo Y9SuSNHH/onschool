@@ -29,8 +29,9 @@ Route::group([
             'as'     => 'auth.'
         ], static function () {
         Route::post('profile', [JwtController::class, 'profile'])->name('profile');
-        Route::post('payload', [JwtController::class, 'payload'])->name('payload');
         Route::post('logout', [JwtController::class, 'logout'])->name('logout');
+        Route::post('payload', [JwtController::class, 'payload'])->name('payload');
+        Route::post('refresh', [JwtController::class, 'refresh'])->name('refresh');
     });
     Route::get('logs', [LogController::class, 'list'])->name('logs.list');
     Route::group(

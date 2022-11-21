@@ -65,6 +65,11 @@ class JwtController extends Controller
         }
     }
 
+    public function refresh(): JsonResponse
+    {
+        return $this->respondWithToken(auth()->refresh());
+    }
+
     public function logout(): JsonResponse
     {
         auth()->logout();

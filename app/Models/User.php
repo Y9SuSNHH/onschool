@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\UserActiveEnum;
 use App\Enums\UserRoleEnum;
 use App\Http\Controllers\ResponseTrait;
+use App\Http\Controllers\SoftDeletesTrait;
+use App\Observers\UserObserver;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,7 +20,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, SoftDeletes, ResponseTrait;
+    use HasFactory, Notifiable, SoftDeletesTrait, ResponseTrait;
 
     protected $table = 'users';
 
@@ -32,7 +34,6 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'active',
         'role',
-        'created_by',
     ];
 
     /**
@@ -52,6 +53,12 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public static function boot() {
+        parent::boot();
+
+        self::observe(UserObserver::class);
+    }
 
     public function getJWTIdentifier()
     {

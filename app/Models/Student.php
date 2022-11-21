@@ -52,7 +52,7 @@ class Student extends Model
     public function list($filter = []): Builder
     {
         $query = DB::table($this->table)
-            ->select("$this->table.*", 'users.username as created_by_username', 'users.role as created_by_role')
+            ->select("$this->table.*", 'users.username as created_by.username', 'users.role as created_by.role')
             ->where("$this->table.deleted_at", '=', null)
             ->join('users', "$this->table.created_by", '=', 'users.id')
             ->orderByDesc("$this->table.id");
